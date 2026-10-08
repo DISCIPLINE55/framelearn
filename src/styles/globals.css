@@ -1,0 +1,104 @@
+@import './theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-bg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accessible Focus Ring Styling */
+  :focus-visible {
+    outline: 2px solid #8FA464;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Typography Classes */
+  .text-display {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 768px) {
+    .text-display {
+      font-size: 3.75rem;
+    }
+  }
+
+  .text-h1 {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 768px) {
+    .text-h1 {
+      font-size: 2.75rem;
+    }
+  }
+
+  .text-h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+
+  @media (min-width: 768px) {
+    .text-h2 {
+      font-size: 2.25rem;
+    }
+  }
+
+  .text-h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  @media (min-width: 768px) {
+    .text-h3 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .text-body-lg {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .text-body {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .text-small {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .text-caption {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}

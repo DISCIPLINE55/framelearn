@@ -1,0 +1,25 @@
+/* FrameLearn Brand Theme Tokens */
+:root {
+  /* Approved Brand Colors */
+  --color-navy: #10212B;
+  --color-navy-dark: #0A151C;
+  --color-navy-light: #1A2C3A;
+
+  --color-sage: #8FA464;
+  --color-sage-hover: #758850;
+  --color-sage-light: #E8EFD9;
+
+  --color-cream: #EFFBDD;
+  --color-cream-soft: #F8FDEE;
+
+  /* Neutral Surface Palette */
+  --color-surface-bg: #EFFBDD;
+  --color-surface-card: #FFFFFF;
+  --color-text-primary: #10212B;
+  --color-text-muted: #4A5D6B;
+  --color-border: #D8E5C4;
+
+  /* Typography Fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+}
