@@ -47,7 +47,7 @@ export const DesignSystemShowcase: React.FC = () => {
               Trigger Modal Component Demo
             </Button>
             <a href="#architecture-docs">
-              <Button variant="outline" className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-navy font-bold">
+              <Button className="btn-outline-hero" size="md">
                 View Architecture Docs
               </Button>
             </a>
@@ -69,7 +69,7 @@ export const DesignSystemShowcase: React.FC = () => {
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-2.5 rounded-frame font-bold text-small transition-all ${
               activeTab === tab.id
-                ? 'bg-navy text-white shadow-subtle'
+                ? 'btn-primary'
                 : 'bg-white text-navy-950 hover:bg-sage-100 border-2 border-sage-300'
             }`}
           >

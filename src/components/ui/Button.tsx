@@ -30,14 +30,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:pointer-events-none disabled:opacity-50 rounded-frame active:scale-[0.98]';
+      'inline-flex items-center justify-center font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:pointer-events-none disabled:opacity-50 rounded-frame active:scale-[0.98] shadow-sm';
 
     const variants: Record<ButtonVariant, string> = {
-      primary: 'bg-navy text-white hover:bg-navy-950 shadow-subtle',
-      secondary: 'bg-sage text-navy-950 hover:bg-sage-600 shadow-subtle',
-      outline: 'border-2 border-navy text-navy-950 bg-white hover:bg-navy hover:text-white',
-      ghost: 'text-navy-950 hover:bg-sage-200 hover:text-navy-950',
-      danger: 'bg-red-700 text-white hover:bg-red-800',
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      outline: 'btn-outline',
+      ghost: 'btn-ghost',
+      danger: 'btn-danger',
     };
 
     const sizes: Record<ComponentSize, string> = {

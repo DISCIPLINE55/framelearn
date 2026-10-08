@@ -17,13 +17,13 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center gap-1.5 font-bold rounded-full tracking-wide transition-colors';
+    'inline-flex items-center gap-1.5 font-bold rounded-full tracking-wide transition-colors shadow-xs';
 
   const variants: Record<BadgeVariant, string> = {
-    navy: 'bg-navy text-white shadow-sm',
-    sage: 'bg-sage text-navy-950 shadow-sm',
-    cream: 'bg-cream text-navy-950 border-2 border-navy-950',
-    outline: 'border-2 border-navy-950 text-navy-950 bg-white',
+    navy: 'badge-navy',
+    sage: 'badge-sage',
+    cream: 'badge-cream',
+    outline: 'badge-outline',
   };
 
   const sizes: Record<ComponentSize, string> = {
