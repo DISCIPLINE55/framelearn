@@ -36,10 +36,10 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       {eyebrow && (
         <span
           className={cn(
-            'text-caption font-bold tracking-widest px-3 py-1 rounded-full',
+            'text-caption font-bold tracking-widest px-3.5 py-1 rounded-full border',
             dark
-              ? 'bg-sage/20 text-sage'
-              : 'bg-sage-100 text-navy-800 border border-sage-300'
+              ? 'bg-sage/25 text-cream border-sage'
+              : 'bg-sage-100 text-navy font-bold border-navy-800'
           )}
         >
           {eyebrow}
@@ -47,7 +47,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       )}
       <h2
         className={cn(
-          'text-h2 font-display font-bold leading-tight',
+          'text-h2 font-display font-bold leading-tight tracking-tight',
           dark ? 'text-cream' : 'text-navy'
         )}
       >
@@ -56,8 +56,8 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       {subtitle && (
         <p
           className={cn(
-            'text-body-lg leading-relaxed',
-            dark ? 'text-cream/80' : 'text-navy-700'
+            'text-body-lg font-medium leading-relaxed',
+            dark ? 'text-cream/95' : 'text-navy-900'
           )}
         >
           {subtitle}

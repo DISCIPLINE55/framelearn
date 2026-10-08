@@ -22,7 +22,6 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   className,
 }) => {
-  // Handle escape key listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -56,41 +55,41 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-navy/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-navy/80 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Dialog Box */}
       <div
         className={cn(
-          'relative w-full bg-white rounded-frame shadow-elevated border border-sage-200 z-10 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200',
+          'relative w-full bg-white rounded-frame shadow-elevated border-2 border-sage-300 z-10 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200',
           sizeClasses[size],
           className
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-sage-200 bg-surface-light/40">
+        <div className="flex items-center justify-between p-6 pb-4 border-b-2 border-sage-300 bg-surface-light">
           <div>
             {title && <h3 className="text-h3 font-display font-bold text-navy">{title}</h3>}
-            {description && <p className="text-small text-navy-600 mt-0.5">{description}</p>}
+            {description && <p className="text-small font-medium text-navy-800 mt-0.5">{description}</p>}
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-full w-9 h-9 p-0 text-navy-600 hover:bg-navy/10"
+            className="rounded-full w-9 h-9 p-0 text-navy hover:bg-navy/10"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[2.5]" />
           </Button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="p-6 overflow-y-auto flex-1 text-navy-950 font-medium">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="p-6 pt-4 border-t border-sage-200 bg-surface-light/40 flex items-center justify-end gap-3">
+          <div className="p-6 pt-4 border-t-2 border-sage-300 bg-surface-light flex items-center justify-end gap-3">
             {footer}
           </div>
         )}

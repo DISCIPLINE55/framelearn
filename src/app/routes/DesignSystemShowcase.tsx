@@ -24,10 +24,10 @@ export const DesignSystemShowcase: React.FC = () => {
     <Container size="lg" className="flex flex-col gap-12 sm:gap-16">
       {/* Hero / Milestone Announcement Banner */}
       <section className="bg-navy text-cream rounded-frame p-8 sm:p-12 shadow-elevated relative overflow-hidden">
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-sage/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col gap-4 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4" />}>
+            <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4 stroke-[2.5]" />}>
               {PROJECT_METADATA.milestone}
             </Badge>
             <Badge variant="cream" size="md">
@@ -35,19 +35,19 @@ export const DesignSystemShowcase: React.FC = () => {
             </Badge>
           </div>
 
-          <h1 className="text-display font-display font-bold leading-tight">
+          <h1 className="text-display font-display font-bold leading-tight tracking-tight text-cream">
             FRAMELEARN
           </h1>
-          <p className="text-body-lg text-cream/85 leading-relaxed">
+          <p className="text-body-lg text-cream font-medium leading-relaxed">
             {PROJECT_METADATA.title}. Technical foundation, architecture, and design system initialized cleanly according to strict specification rules.
           </p>
 
           <div className="pt-4 flex flex-wrap items-center gap-4">
-            <Button variant="secondary" onClick={() => setIsModalOpen(true)} leftIcon={<Layers className="w-4 h-4" />}>
+            <Button variant="secondary" onClick={() => setIsModalOpen(true)} leftIcon={<Layers className="w-4 h-4 stroke-[2.5]" />}>
               Trigger Modal Component Demo
             </Button>
             <a href="#architecture-docs">
-              <Button variant="outline" className="border-cream text-cream hover:bg-cream hover:text-navy">
+              <Button variant="outline" className="border-cream text-cream hover:bg-cream hover:text-navy font-bold">
                 View Architecture Docs
               </Button>
             </a>
@@ -56,7 +56,7 @@ export const DesignSystemShowcase: React.FC = () => {
       </section>
 
       {/* Navigation Tabs for Showcase Sections */}
-      <nav className="flex flex-wrap items-center gap-2 border-b border-sage-300 pb-4">
+      <nav className="flex flex-wrap items-center gap-2 border-b-2 border-sage-400 pb-4">
         {[
           { id: 'tokens', label: '1. Brand Identity & Colors' },
           { id: 'components', label: '2. UI Component Foundation' },
@@ -67,10 +67,10 @@ export const DesignSystemShowcase: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2 rounded-frame font-medium text-small transition-all ${
+            className={`px-4 py-2.5 rounded-frame font-bold text-small transition-all ${
               activeTab === tab.id
                 ? 'bg-navy text-cream shadow-subtle'
-                : 'bg-white text-navy hover:bg-sage-100 border border-sage-200'
+                : 'bg-white text-navy hover:bg-sage-100 border-2 border-sage-300'
             }`}
           >
             {tab.label}
@@ -97,7 +97,7 @@ export const DesignSystemShowcase: React.FC = () => {
                 <CardTitle>Primary Navy</CardTitle>
                 <Badge variant="navy" className="w-fit">#10212B</Badge>
               </CardHeader>
-              <CardContent className="text-small text-navy-600">
+              <CardContent className="text-small text-navy-950 font-medium">
                 Used for header/navigation, footers, primary headings, key buttons, and strong high-contrast structural framing.
               </CardContent>
             </Card>
@@ -111,7 +111,7 @@ export const DesignSystemShowcase: React.FC = () => {
                 <CardTitle>Sage Green</CardTitle>
                 <Badge variant="sage" className="w-fit">#8FA464</Badge>
               </CardHeader>
-              <CardContent className="text-small text-navy-600">
+              <CardContent className="text-small text-navy-950 font-medium">
                 Used for brand accents, secondary actions, selected states, badges, and visual highlights.
               </CardContent>
             </Card>
@@ -119,13 +119,13 @@ export const DesignSystemShowcase: React.FC = () => {
             {/* Cream Token */}
             <Card className="flex flex-col justify-between">
               <CardHeader>
-                <div className="h-24 w-full rounded-frame bg-cream border border-sage-300 flex items-center justify-center text-navy font-bold text-h3 shadow-subtle mb-3">
+                <div className="h-24 w-full rounded-frame bg-cream border-2 border-sage-300 flex items-center justify-center text-navy font-bold text-h3 shadow-subtle mb-3">
                   {BRAND_COLORS.CREAM}
                 </div>
                 <CardTitle>Light Cream</CardTitle>
                 <Badge variant="cream" className="w-fit">#EFFBDD</Badge>
               </CardHeader>
-              <CardContent className="text-small text-navy-600">
+              <CardContent className="text-small text-navy-950 font-medium">
                 Used for main light backgrounds, soft section surfaces, and visual breathing space for photography.
               </CardContent>
             </Card>
@@ -134,30 +134,30 @@ export const DesignSystemShowcase: React.FC = () => {
           {/* Typography Scale */}
           <Card className="p-8 flex flex-col gap-6">
             <SectionHeading eyebrow="Typography Hierarchy" title="Font Scale & Styles" />
-            <div className="space-y-4 divide-y divide-sage-200">
+            <div className="space-y-4 divide-y-2 divide-sage-200">
               <div className="pt-2">
-                <span className="text-caption text-navy-500">Display Hero / Title</span>
-                <p className="text-display font-display text-navy">Outfit Display Bold (3.75rem / 60px)</p>
+                <span className="text-caption font-bold text-navy-900">Display Hero / Title</span>
+                <p className="text-display font-display font-bold text-navy">Outfit Display Bold (3.75rem / 60px)</p>
               </div>
               <div className="pt-4">
-                <span className="text-caption text-navy-500">Heading 1</span>
-                <p className="text-h1 font-display text-navy">Outfit Heading 1 (2.75rem / 44px)</p>
+                <span className="text-caption font-bold text-navy-900">Heading 1</span>
+                <p className="text-h1 font-display font-bold text-navy">Outfit Heading 1 (2.75rem / 44px)</p>
               </div>
               <div className="pt-4">
-                <span className="text-caption text-navy-500">Heading 2</span>
-                <p className="text-h2 font-display text-navy">Outfit Heading 2 (2.25rem / 36px)</p>
+                <span className="text-caption font-bold text-navy-900">Heading 2</span>
+                <p className="text-h2 font-display font-bold text-navy">Outfit Heading 2 (2.25rem / 36px)</p>
               </div>
               <div className="pt-4">
-                <span className="text-caption text-navy-500">Heading 3</span>
-                <p className="text-h3 font-display text-navy">Outfit Heading 3 (1.5rem / 24px)</p>
+                <span className="text-caption font-bold text-navy-900">Heading 3</span>
+                <p className="text-h3 font-display font-bold text-navy">Outfit Heading 3 (1.5rem / 24px)</p>
               </div>
               <div className="pt-4">
-                <span className="text-caption text-navy-500">Body Large</span>
-                <p className="text-body-lg text-navy">Inter Body Large — Crisp, editorial text presentation (1.125rem / 18px)</p>
+                <span className="text-caption font-bold text-navy-900">Body Large</span>
+                <p className="text-body-lg font-medium text-navy-950">Inter Body Large — Crisp, editorial text presentation (1.125rem / 18px)</p>
               </div>
               <div className="pt-4">
-                <span className="text-caption text-navy-500">Small & Caption</span>
-                <p className="text-small text-navy-700">Inter Small (0.875rem / 14px) and <span className="text-caption font-bold">Caption (0.75rem / 12px UPPERCASE)</span></p>
+                <span className="text-caption font-bold text-navy-900">Small & Caption</span>
+                <p className="text-small font-semibold text-navy-950">Inter Small (0.875rem / 14px) and <span className="text-caption font-bold text-navy">Caption (0.75rem / 12px UPPERCASE)</span></p>
               </div>
             </div>
           </Card>
@@ -230,14 +230,14 @@ export const DesignSystemShowcase: React.FC = () => {
                 <Input
                   label="Full Name"
                   placeholder="Ismail Ibrahim Mensah"
-                  leftIcon={<User className="w-4 h-4 text-navy-500" />}
+                  leftIcon={<User className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
                   helperText="Required for upcoming booking forms in future milestones."
                 />
                 <Input
                   label="Email Address"
                   type="email"
                   placeholder="ismail@example.com"
-                  leftIcon={<Mail className="w-4 h-4 text-navy-500" />}
+                  leftIcon={<Mail className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
                   errorText="Sample validation error state demo."
                 />
                 <Select
@@ -372,41 +372,41 @@ export const DesignSystemShowcase: React.FC = () => {
             subtitle="Summary of files, documentation hierarchy, and lecturer review gate checklist."
           />
 
-          <Card className="p-8 bg-white border border-sage-300">
+          <Card className="p-8 bg-white border-2 border-sage-400">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col gap-4">
                 <h3 className="text-h3 font-display font-bold text-navy flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-sage-600" />
+                  <CheckCircle2 className="w-5 h-5 text-navy stroke-[2.5]" />
                   Milestone 001 Completion Checklist
                 </h3>
-                <ul className="space-y-2 text-small text-navy-700">
+                <ul className="space-y-2.5 text-small font-semibold text-navy-950">
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> Fresh project initialized cleanly without legacy code.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Fresh project initialized cleanly without legacy code.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> Strict TypeScript & Tailwind CSS brand tokens established.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Strict TypeScript & Tailwind CSS brand tokens established.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> Application Shell (Header, Navigation, Footer) created.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Application Shell (Header, Navigation, Footer) created.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> 14 reusable UI primitives built & tested with Vitest.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> 14 reusable UI primitives built & tested with Vitest.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> Documentation structure created under `docs/`.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Documentation structure created under `docs/`.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sage" /> GitHub Actions CI pipeline configured (`ci.yml`).
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> GitHub Actions CI pipeline configured (`ci.yml`).
                   </li>
                 </ul>
               </div>
 
-              <div className="flex flex-col gap-4 bg-cream p-6 rounded-frame border border-sage-300">
+              <div className="flex flex-col gap-4 bg-cream p-6 rounded-frame border-2 border-navy-800 shadow-subtle">
                 <h3 className="text-h3 font-display font-bold text-navy flex items-center gap-2">
-                  <ShieldAlert className="w-5 h-5 text-sage-700" />
+                  <ShieldAlert className="w-5 h-5 text-navy stroke-[2.5]" />
                   Lecturer Review Gate Notice
                 </h3>
-                <p className="text-small text-navy-800 leading-relaxed">
+                <p className="text-small text-navy-950 font-semibold leading-relaxed">
                   Development is paused at Milestone 001. No business tables, login flows, booking forms, or private gallery delivery features have been prematurely implemented.
                 </p>
                 <div className="pt-2">
@@ -438,12 +438,12 @@ export const DesignSystemShowcase: React.FC = () => {
         }
       >
         <div className="flex flex-col gap-4">
-          <p className="text-body text-navy-700">
+          <p className="text-body font-semibold text-navy-950">
             This Modal component features focus trapping, escape key closure, and backdrop dimming. It is fully integrated with FrameLearn design tokens.
           </p>
-          <div className="p-4 bg-cream rounded-frame border border-sage-300">
+          <div className="p-4 bg-cream rounded-frame border-2 border-navy-800">
             <span className="text-caption font-bold text-navy">Design Token Check</span>
-            <p className="text-small text-navy-800 mt-1">
+            <p className="text-small font-bold text-navy-950 mt-1">
               Primary Navy `#10212B`, Sage Green `#8FA464`, Light Cream `#EFFBDD`.
             </p>
           </div>

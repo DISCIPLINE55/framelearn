@@ -40,7 +40,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="text-small font-semibold text-navy flex items-center gap-1"
+            className="text-small font-bold text-navy flex items-center gap-1"
           >
             {label}
             {required && <span className="text-red-700">*</span>}
@@ -54,33 +54,33 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disabled={disabled}
             required={required}
             className={cn(
-              'h-11 w-full rounded-frame border bg-white px-3.5 py-2 pr-10 text-body text-navy transition-colors appearance-none cursor-pointer',
+              'h-11 w-full rounded-frame border-2 bg-white px-3.5 py-2 pr-10 text-body font-medium text-navy transition-colors appearance-none cursor-pointer',
               'focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage',
               'disabled:cursor-not-allowed disabled:bg-cream-100 disabled:opacity-60',
               hasError
-                ? 'border-red-600 focus:ring-red-500 focus:border-red-600'
-                : 'border-sage-300 hover:border-navy-400',
+                ? 'border-red-700 focus:ring-red-600 focus:border-red-700'
+                : 'border-sage-400 hover:border-navy-800',
               className
             )}
             {...props}
           >
             {options.map((opt) => (
-              <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+              <option key={opt.value} value={opt.value} disabled={opt.disabled} className="text-navy font-medium">
                 {opt.label}
               </option>
             ))}
           </select>
 
-          <div className="absolute right-3.5 text-navy-600 pointer-events-none flex items-center">
-            <ChevronDown className="w-4 h-4" />
+          <div className="absolute right-3.5 text-navy-800 pointer-events-none flex items-center">
+            <ChevronDown className="w-5 h-5 stroke-[2.5]" />
           </div>
         </div>
 
         {hasError && (
-          <p className="text-caption text-red-700 font-medium">{errorText}</p>
+          <p className="text-caption text-red-700 font-bold">{errorText}</p>
         )}
         {!hasError && helperText && (
-          <p className="text-caption text-navy-600">{helperText}</p>
+          <p className="text-caption text-navy-800 font-medium">{helperText}</p>
         )}
       </div>
     );

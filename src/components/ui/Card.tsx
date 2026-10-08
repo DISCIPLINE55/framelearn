@@ -14,10 +14,10 @@ export const Card: React.FC<CardProps> = ({
   const baseStyles = 'rounded-frame transition-shadow overflow-hidden';
 
   const variants = {
-    default: 'bg-white border border-sage-200 shadow-subtle hover:shadow-elevated',
-    soft: 'bg-cream border border-sage-300 shadow-subtle',
-    navy: 'bg-navy text-cream border border-navy-800 shadow-elevated',
-    outline: 'bg-transparent border-2 border-sage-300',
+    default: 'bg-white border-2 border-sage-300 shadow-subtle hover:shadow-elevated',
+    soft: 'bg-cream border-2 border-sage-400 shadow-subtle',
+    navy: 'bg-navy text-cream border-2 border-navy-800 shadow-elevated',
+    outline: 'bg-transparent border-2 border-sage-400',
   };
 
   return (
@@ -42,7 +42,7 @@ export const CardTitle: React.FC<HTMLAttributes<HTMLHeadingElement>> = ({
   children,
   ...props
 }) => (
-  <h3 className={cn('text-h3 text-navy font-display font-bold', className)} {...props}>
+  <h3 className={cn('text-h3 text-navy font-display font-bold tracking-tight', className)} {...props}>
     {children}
   </h3>
 );
@@ -52,7 +52,7 @@ export const CardSubtitle: React.FC<HTMLAttributes<HTMLParagraphElement>> = ({
   children,
   ...props
 }) => (
-  <p className={cn('text-small text-navy-600', className)} {...props}>
+  <p className={cn('text-small text-navy-800 font-medium', className)} {...props}>
     {children}
   </p>
 );
@@ -62,7 +62,7 @@ export const CardContent: React.FC<HTMLAttributes<HTMLDivElement>> = ({
   children,
   ...props
 }) => (
-  <div className={cn('p-6 pt-2 text-body', className)} {...props}>
+  <div className={cn('p-6 pt-2 text-body text-navy-900', className)} {...props}>
     {children}
   </div>
 );
@@ -74,7 +74,7 @@ export const CardFooter: React.FC<HTMLAttributes<HTMLDivElement>> = ({
 }) => (
   <div
     className={cn(
-      'p-6 pt-3 border-t border-sage-200/60 bg-surface-light/40 flex items-center justify-between gap-4',
+      'p-6 pt-3 border-t-2 border-sage-300 bg-surface-light/60 flex items-center justify-between gap-4 text-navy-900 font-medium',
       className
     )}
     {...props}

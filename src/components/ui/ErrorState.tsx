@@ -19,17 +19,17 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
     <div
       role="alert"
       className={cn(
-        'flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-red-50/50 rounded-frame border border-red-200 min-h-[260px]',
+        'flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-red-50 rounded-frame border-2 border-red-300 min-h-[260px]',
         className
       )}
     >
-      <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-red-700 mb-4 shadow-subtle">
-        <AlertTriangle className="w-7 h-7" />
+      <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-red-800 mb-4 shadow-subtle border border-red-300">
+        <AlertTriangle className="w-7 h-7 stroke-[2.5]" />
       </div>
-      <h4 className="text-h3 font-display font-semibold text-navy mb-1.5">{title}</h4>
-      <p className="text-body text-navy-700 max-w-md mb-6">{message}</p>
+      <h4 className="text-h3 font-display font-bold text-navy mb-1.5">{title}</h4>
+      <p className="text-body font-medium text-navy-950 max-w-md mb-6">{message}</p>
       {onRetry && (
-        <Button variant="outline" onClick={onRetry} leftIcon={<RefreshCw className="w-4 h-4" />}>
+        <Button variant="outline" onClick={onRetry} leftIcon={<RefreshCw className="w-4 h-4 stroke-[2.5]" />}>
           {actionLabel}
         </Button>
       )}
