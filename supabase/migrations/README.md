@@ -1,0 +1,3 @@
+-- FrameLearn Supabase Migrations Directory
+-- Database migrations will be added starting in approved future milestones.
+-- Milestone 001 intentionally contains NO business tables.
