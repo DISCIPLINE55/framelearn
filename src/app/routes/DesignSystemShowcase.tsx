@@ -23,7 +23,7 @@ export const DesignSystemShowcase: React.FC = () => {
   return (
     <Container size="lg" className="flex flex-col gap-12 sm:gap-16">
       {/* Hero / Milestone Announcement Banner */}
-      <section className="bg-navy text-cream rounded-frame p-8 sm:p-12 shadow-elevated relative overflow-hidden">
+      <section className="bg-navy text-white rounded-frame p-8 sm:p-12 shadow-elevated relative overflow-hidden">
         <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-sage/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col gap-4 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
@@ -35,10 +35,10 @@ export const DesignSystemShowcase: React.FC = () => {
             </Badge>
           </div>
 
-          <h1 className="text-display font-display font-bold leading-tight tracking-tight text-cream">
+          <h1 className="text-display font-display font-bold leading-tight tracking-tight text-white">
             FRAMELEARN
           </h1>
-          <p className="text-body-lg text-cream font-medium leading-relaxed">
+          <p className="text-body-lg text-white font-medium leading-relaxed">
             {PROJECT_METADATA.title}. Technical foundation, architecture, and design system initialized cleanly according to strict specification rules.
           </p>
 
@@ -47,7 +47,7 @@ export const DesignSystemShowcase: React.FC = () => {
               Trigger Modal Component Demo
             </Button>
             <a href="#architecture-docs">
-              <Button variant="outline" className="border-cream text-cream hover:bg-cream hover:text-navy font-bold">
+              <Button variant="outline" className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-navy font-bold">
                 View Architecture Docs
               </Button>
             </a>
@@ -69,8 +69,8 @@ export const DesignSystemShowcase: React.FC = () => {
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-2.5 rounded-frame font-bold text-small transition-all ${
               activeTab === tab.id
-                ? 'bg-navy text-cream shadow-subtle'
-                : 'bg-white text-navy hover:bg-sage-100 border-2 border-sage-300'
+                ? 'bg-navy text-white shadow-subtle'
+                : 'bg-white text-navy-950 hover:bg-sage-100 border-2 border-sage-300'
             }`}
           >
             {tab.label}
@@ -91,7 +91,7 @@ export const DesignSystemShowcase: React.FC = () => {
             {/* Navy Token */}
             <Card className="flex flex-col justify-between">
               <CardHeader>
-                <div className="h-24 w-full rounded-frame bg-navy flex items-center justify-center text-cream font-bold text-h3 shadow-subtle mb-3">
+                <div className="h-24 w-full rounded-frame bg-navy flex items-center justify-center text-white font-bold text-h3 shadow-subtle mb-3">
                   {BRAND_COLORS.NAVY}
                 </div>
                 <CardTitle>Primary Navy</CardTitle>
@@ -105,7 +105,7 @@ export const DesignSystemShowcase: React.FC = () => {
             {/* Sage Token */}
             <Card className="flex flex-col justify-between">
               <CardHeader>
-                <div className="h-24 w-full rounded-frame bg-sage flex items-center justify-center text-navy font-bold text-h3 shadow-subtle mb-3">
+                <div className="h-24 w-full rounded-frame bg-sage flex items-center justify-center text-navy-950 font-bold text-h3 shadow-subtle mb-3">
                   {BRAND_COLORS.SAGE}
                 </div>
                 <CardTitle>Sage Green</CardTitle>
@@ -119,7 +119,7 @@ export const DesignSystemShowcase: React.FC = () => {
             {/* Cream Token */}
             <Card className="flex flex-col justify-between">
               <CardHeader>
-                <div className="h-24 w-full rounded-frame bg-cream border-2 border-sage-300 flex items-center justify-center text-navy font-bold text-h3 shadow-subtle mb-3">
+                <div className="h-24 w-full rounded-frame bg-cream border-2 border-sage-300 flex items-center justify-center text-navy-950 font-bold text-h3 shadow-subtle mb-3">
                   {BRAND_COLORS.CREAM}
                 </div>
                 <CardTitle>Light Cream</CardTitle>

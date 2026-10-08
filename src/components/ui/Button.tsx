@@ -30,20 +30,20 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:pointer-events-none disabled:opacity-50 rounded-frame active:scale-[0.98]';
+      'inline-flex items-center justify-center font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage disabled:pointer-events-none disabled:opacity-50 rounded-frame active:scale-[0.98]';
 
     const variants: Record<ButtonVariant, string> = {
-      primary: 'bg-navy text-cream hover:bg-navy-800 shadow-subtle',
-      secondary: 'bg-sage text-navy hover:bg-sage-600 font-semibold shadow-subtle',
-      outline: 'border-2 border-navy text-navy hover:bg-navy hover:text-cream',
-      ghost: 'text-navy hover:bg-sage-100 hover:text-navy-900',
-      danger: 'bg-red-800 text-white hover:bg-red-900',
+      primary: 'bg-navy text-white hover:bg-navy-950 shadow-subtle',
+      secondary: 'bg-sage text-navy-950 hover:bg-sage-600 shadow-subtle',
+      outline: 'border-2 border-navy text-navy-950 bg-white hover:bg-navy hover:text-white',
+      ghost: 'text-navy-950 hover:bg-sage-200 hover:text-navy-950',
+      danger: 'bg-red-700 text-white hover:bg-red-800',
     };
 
     const sizes: Record<ComponentSize, string> = {
       sm: 'h-9 px-3.5 text-small gap-1.5',
       md: 'h-11 px-5 text-body gap-2',
-      lg: 'h-13 px-7 text-body-lg gap-2.5 font-semibold',
+      lg: 'h-13 px-7 text-body-lg gap-2.5 font-bold',
     };
 
     return (
@@ -63,10 +63,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <Loader2 className="w-4 h-4 animate-spin text-current" />
         ) : (
-          leftIcon
+          leftIcon && <span className="text-current flex items-center">{leftIcon}</span>
         )}
-        <span>{children}</span>
-        {!isLoading && rightIcon}
+        <span className="text-current">{children}</span>
+        {!isLoading && rightIcon && <span className="text-current flex items-center">{rightIcon}</span>}
       </button>
     );
   }
