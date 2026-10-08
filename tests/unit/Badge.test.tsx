@@ -7,6 +7,6 @@ describe('Badge Component', () => {
     render(<Badge variant="sage">Sage Tag</Badge>);
     const badge = screen.getByText('Sage Tag');
     expect(badge).toBeInTheDocument();
-    expect(badge.parentElement).toHaveClass('bg-sage');
+    expect(badge.parentElement).toHaveClass('badge-sage');
   });
 });

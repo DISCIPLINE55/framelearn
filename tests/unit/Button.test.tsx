@@ -7,7 +7,7 @@ describe('Button Primitive Component', () => {
     render(<Button variant="primary">Click Me</Button>);
     const button = screen.getByRole('button', { name: /click me/i });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveClass('bg-navy');
+    expect(button).toHaveClass('btn-primary');
   });
 
   it('handles click events and disabled state properly', () => {
