@@ -14,8 +14,8 @@ export const FOOTER_PRODUCT_ITEMS: NavigationItem[] = [
   { id: 'portfolio', label: 'Portfolio Preview', href: '#portfolio' },
   { id: 'services', label: 'Photography Services', href: '#services' },
   { id: 'learning', label: 'Learning Hub', href: '#learning' },
-  { id: 'about', label: 'About Project Vision', href: '#about' },
-  { id: 'contact', label: 'Contact Shell', href: '#contact' },
+  { id: 'about', label: 'About FrameLearn', href: '#about' },
+  { id: 'contact', label: 'Contact FrameLearn', href: '#contact' },
 ];
 
 export const REVIEW_NAV_ITEMS: NavigationItem[] = [
