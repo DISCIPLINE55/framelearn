@@ -25,15 +25,19 @@ export const PortfolioPreviewPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Milestone 001 Portfolio Scope Preview
+          Curated Portfolio Preview
         </Badge>
       </div>
 
       <SectionHeading
         eyebrow="Photography Showcase"
-        title="Portfolio Preview"
+        title="Portfolio Showcase"
         subtitle="Explore curated photography work across portraits, weddings, graduation sessions, events, and product photography."
       />
+
+      <p className="text-small text-navy-800 font-medium italic -mt-6">
+        * Curated sample photography demonstrating platform presentation capabilities.
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {portfolioItems.map((item) => (
@@ -49,11 +53,11 @@ export const PortfolioPreviewPage: React.FC = () => {
 
       <div className="p-6 bg-cream rounded-frame border-2 border-navy-800 flex items-center justify-between gap-4">
         <div className="flex flex-col">
-          <span className="font-bold text-navy">Planned Milestone 003 Feature</span>
-          <span className="text-small text-navy-950 font-medium">Interactive portfolio filter tabs, lightbox zoom, and category management will be enabled in Milestone 003.</span>
+          <span className="font-bold text-navy">Interactive Portfolio Engine</span>
+          <span className="text-small text-navy-950 font-medium">Interactive category filtering, high-resolution lightbox viewing, and client gallery proofing will be available in future platform updates.</span>
         </div>
         <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4" />}>
-          Milestone 003
+          Platform Roadmap
         </Badge>
       </div>
     </Container>

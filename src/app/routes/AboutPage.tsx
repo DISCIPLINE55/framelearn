@@ -16,7 +16,7 @@ export const AboutPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Milestone 001 Vision Overview
+          Platform Architecture & Vision
         </Badge>
       </div>
 

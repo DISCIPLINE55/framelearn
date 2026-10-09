@@ -178,7 +178,7 @@ export const HomePage: React.FC = () => {
                   Photography Platform Concept
                 </Badge>
                 <Badge variant="cream" size="md">
-                  Milestone 001 Foundation
+                  Platform Overview
                 </Badge>
               </div>
 
@@ -279,7 +279,7 @@ export const HomePage: React.FC = () => {
               </CardContent>
               <div className="pt-4 border-t border-sage-200">
                 <a href="#services" className="inline-flex items-center gap-2 text-small font-bold text-navy hover:text-sage transition-colors">
-                  <span>Explore Services Scope</span>
+                  <span>Explore Services</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </a>
               </div>
@@ -299,7 +299,7 @@ export const HomePage: React.FC = () => {
               </CardContent>
               <div className="pt-4 border-t border-sage-200">
                 <a href="#about" className="inline-flex items-center gap-2 text-small font-bold text-navy hover:text-sage transition-colors">
-                  <span>Learn Project Vision</span>
+                  <span>Explore Project Vision</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </a>
               </div>
@@ -319,7 +319,7 @@ export const HomePage: React.FC = () => {
               </CardContent>
               <div className="pt-4 border-t border-sage-200">
                 <a href="#learning" className="inline-flex items-center gap-2 text-small font-bold text-navy hover:text-sage transition-colors">
-                  <span>View Educational Topics</span>
+                  <span>Explore Educational Hub</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </a>
               </div>
@@ -339,7 +339,7 @@ export const HomePage: React.FC = () => {
               className="mb-0"
             />
             <Badge variant="navy" size="md" className="w-fit">
-              Presentation Preview • Milestone 001 Scope
+              Photography Offerings
             </Badge>
           </div>
 
@@ -368,7 +368,7 @@ export const HomePage: React.FC = () => {
                     fullWidth
                     onClick={() => setSelectedService(service)}
                   >
-                    Explore Service Scope
+                    Explore Service Details
                   </Button>
                 </div>
               </Card>
@@ -383,7 +383,7 @@ export const HomePage: React.FC = () => {
           <SectionHeading
             eyebrow="Visual Portfolio Preview"
             title="Curated Photography Showcase"
-            subtitle="Demonstrating how photography assets will be presented within the FrameLearn portfolio lightbox engine."
+            subtitle="Explore curated photography work across portraits, weddings, graduation sessions, events, and product photography."
             align="center"
           />
 
@@ -420,7 +420,7 @@ export const HomePage: React.FC = () => {
               </p>
             </div>
             <Badge variant="cream" size="md" className="w-fit">
-              Learning Hub Preview
+              Educational Offering
             </Badge>
           </div>
 
@@ -442,7 +442,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className="pt-2 border-t border-navy-700/60 flex items-center justify-between text-caption font-bold text-sage">
-                  <span>Module Scope Defined</span>
+                  <span>Core Curriculum Topic</span>
                   <BookCheck className="w-4 h-4" />
                 </div>
               </div>
@@ -501,7 +501,7 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 flex flex-col gap-4">
               <Badge variant="navy" size="sm" className="w-fit">
-                About The Project Vision
+                About FrameLearn
               </Badge>
               <h2 className="text-h1 font-display font-bold text-navy tracking-tight">
                 Bridging Photography Practice & Education
@@ -520,7 +520,7 @@ export const HomePage: React.FC = () => {
                 </a>
                 <a href="#design-system">
                   <Button variant="outline" size="md">
-                    Review Architecture Docs
+                    Review Project Documentation
                   </Button>
                 </a>
               </div>
@@ -589,7 +589,7 @@ export const HomePage: React.FC = () => {
                 <div className="flex flex-col">
                   <span className="text-small font-bold text-navy">Response Hours</span>
                   <span className="text-body font-medium text-navy-950">Monday - Friday: 8:00 AM - 5:00 PM</span>
-                  <span className="text-caption text-navy-800 mt-1">Milestone 001 Inquiry Preview</span>
+                  <span className="text-caption text-navy-800 mt-1">Inquiry Support Window</span>
                 </div>
               </div>
             </div>
@@ -597,8 +597,8 @@ export const HomePage: React.FC = () => {
             {/* Contact Form Preview (Non-Functional) */}
             <div className="lg:col-span-7 bg-white p-8 rounded-frame border-2 border-sage-300 shadow-subtle flex flex-col gap-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-h3 font-display font-bold text-navy">Send an Inquiry (Preview)</h3>
-                <Badge variant="sage" size="sm">Milestone 001 Form</Badge>
+                <h3 className="text-h3 font-display font-bold text-navy">Send an Inquiry</h3>
+                <Badge variant="sage" size="sm">Demonstration Form</Badge>
               </div>
 
               {contactFormSubmitted ? (
@@ -642,9 +642,9 @@ export const HomePage: React.FC = () => {
                     required
                   />
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-caption font-bold text-navy-800">* Milestone 001 Non-Functional Form</span>
+                    <span className="text-caption font-bold text-navy-800">* Demonstration Preview — Interactive submission active upon backend connection</span>
                     <Button type="submit" variant="primary" rightIcon={<Send className="w-4 h-4 stroke-[2.5]" />}>
-                      Submit Inquiry Preview
+                      Send Inquiry (Preview)
                     </Button>
                   </div>
                 </form>
@@ -673,7 +673,7 @@ export const HomePage: React.FC = () => {
             <p className="text-small font-semibold text-navy-950">{selectedService?.scope}</p>
           </div>
           <p className="text-caption font-bold text-navy-800 italic">
-            * Presentation-only preview. Live booking schedule and session pricing will be enabled in Milestone 004.
+            * Demonstration Preview — Live session booking and direct scheduling will be available in future platform updates.
           </p>
         </div>
       </Modal>
@@ -701,7 +701,7 @@ export const HomePage: React.FC = () => {
             />
           )}
           <p className="text-caption font-bold text-navy-800 italic text-center">
-            * Milestone 001 Lightbox Preview. Full gallery delivery & proofing will be enabled in Milestone 005.
+            * Interactive Lightbox Preview — High-resolution proofing and client gallery delivery will be available in future platform updates.
           </p>
         </div>
       </Modal>

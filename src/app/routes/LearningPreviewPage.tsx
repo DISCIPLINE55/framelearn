@@ -25,13 +25,13 @@ export const LearningPreviewPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Milestone 001 Learning Scope Preview
+          Practical Education
         </Badge>
       </div>
 
       <SectionHeading
         eyebrow="Practical Education"
-        title="Learning Hub Preview"
+        title="Learning Hub Showcase"
         subtitle="Practical photography education designed for aspiring photographers developing hands-on technical skills."
       />
 
@@ -51,11 +51,11 @@ export const LearningPreviewPage: React.FC = () => {
 
       <div className="p-6 bg-cream rounded-frame border-2 border-navy-800 flex items-center justify-between gap-4">
         <div className="flex flex-col">
-          <span className="font-bold text-navy">Planned Milestone 006 Feature</span>
-          <span className="text-small text-navy-950 font-medium">Interactive course modules, video guides, PDF downloads, and workshop registration will be enabled in Milestone 006.</span>
+          <span className="font-bold text-navy">Interactive Learning Hub</span>
+          <span className="text-small text-navy-950 font-medium">Interactive course modules, video guides, downloadable learning resources, and workshop registration will be available in future platform updates.</span>
         </div>
         <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4" />}>
-          Milestone 006
+          Platform Roadmap
         </Badge>
       </div>
     </Container>

@@ -17,7 +17,7 @@ export const ContactPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Milestone 001 Contact Preview
+          Client Inquiry Channel
         </Badge>
       </div>
 
@@ -36,6 +36,7 @@ export const ContactPage: React.FC = () => {
             <div className="flex flex-col">
               <span className="text-small font-bold text-navy">Email Inquiry</span>
               <span className="text-body font-medium text-navy-950">info@framelearn.edu.gh</span>
+              <span className="text-caption text-navy-800 mt-1">Project Contact Channel</span>
             </div>
           </div>
 
@@ -46,6 +47,7 @@ export const ContactPage: React.FC = () => {
             <div className="flex flex-col">
               <span className="text-small font-bold text-navy">Location</span>
               <span className="text-body font-medium text-navy-950">Kumasi / Accra, Ghana</span>
+              <span className="text-caption text-navy-800 mt-1">Project Service Area</span>
             </div>
           </div>
 
@@ -56,14 +58,15 @@ export const ContactPage: React.FC = () => {
             <div className="flex flex-col">
               <span className="text-small font-bold text-navy">Response Hours</span>
               <span className="text-body font-medium text-navy-950">Mon - Fri: 8:00 AM - 5:00 PM</span>
+              <span className="text-caption text-navy-800 mt-1">Inquiry Support Window</span>
             </div>
           </div>
         </div>
 
         <div className="lg:col-span-7 bg-white p-8 rounded-frame border-2 border-sage-300 shadow-subtle flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-h3 font-display font-bold text-navy">Inquiry Form (Preview)</h3>
-            <Badge variant="sage" size="sm">Milestone 001 Preview</Badge>
+            <h3 className="text-h3 font-display font-bold text-navy">Send an Inquiry</h3>
+            <Badge variant="sage" size="sm">Demonstration Form</Badge>
           </div>
 
           <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4">
@@ -73,9 +76,9 @@ export const ContactPage: React.FC = () => {
             </div>
             <Textarea label="Inquiry Note" placeholder="Provide session details or questions..." rows={4} />
             <div className="pt-2 flex items-center justify-between">
-              <span className="text-caption font-bold text-navy-800">* Milestone 001 Non-Functional Preview</span>
+              <span className="text-caption font-bold text-navy-800">* Demonstration Preview — Interactive submission active upon backend connection</span>
               <Button type="submit" variant="primary" rightIcon={<Send className="w-4 h-4 stroke-[2.5]" />}>
-                Submit Preview
+                Send Inquiry (Preview)
               </Button>
             </div>
           </form>

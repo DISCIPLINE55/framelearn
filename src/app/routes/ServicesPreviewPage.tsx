@@ -15,6 +15,7 @@ export const ServicesPreviewPage: React.FC = () => {
     { title: 'Birthday & Special Occasions', image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80', description: 'Milestone birthday celebrations and private party documentation.' },
     { title: 'Product & Commercial Photography', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80', description: 'E-commerce product shots, menu imagery, and commercial branding.' },
     { title: 'Photo Editing & Retouching', image: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=800&q=80', description: 'High-end color grading, retouching, and asset preparation.' },
+    { title: 'Photography Training & Masterclasses', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80', description: 'Hands-on technical camera training and group workshops.' },
   ];
 
   return (
@@ -26,13 +27,13 @@ export const ServicesPreviewPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Milestone 001 Services Scope Preview
+          Services Catalog
         </Badge>
       </div>
 
       <SectionHeading
         eyebrow="Photography Offerings"
-        title="Services Catalog Preview"
+        title="Services Catalog"
         subtitle="Overview of photography service packages designed for the FrameLearn platform."
       />
 
@@ -50,11 +51,11 @@ export const ServicesPreviewPage: React.FC = () => {
 
       <div className="p-6 bg-cream rounded-frame border-2 border-navy-800 flex items-center justify-between gap-4">
         <div className="flex flex-col">
-          <span className="font-bold text-navy">Planned Milestone 004 Feature</span>
-          <span className="text-small text-navy-950 font-medium">Interactive session booking, package customization, and calendar scheduling will be enabled in Milestone 004.</span>
+          <span className="font-bold text-navy">Custom Bookings & Scheduling</span>
+          <span className="text-small text-navy-950 font-medium">Direct online session booking, package customization, and availability calendar scheduling will be available in future platform updates.</span>
         </div>
         <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4" />}>
-          Milestone 004
+          Platform Roadmap
         </Badge>
       </div>
     </Container>
