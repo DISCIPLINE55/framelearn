@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from '../../components/layout/Container';
 import { SectionHeading } from '../../components/ui/SectionHeading';
 import { Button } from '../../components/ui/Button';
@@ -12,13 +12,32 @@ import { LoadingState } from '../../components/ui/LoadingState';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { ImageContainer } from '../../components/media/ImageContainer';
+import { NotificationDemo } from '../../features/notifications/NotificationDemo';
+import { DocumentationHub } from '../../features/docs/DocumentationHub';
+import { useToast } from '../providers/ToastContext';
 import { PROJECT_METADATA } from '../../constants/project';
 import { BRAND_COLORS } from '../../constants/theme';
-import { Layers, Mail, User, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Layers, Mail, User, Sparkles, CheckCircle2, ShieldAlert, Bell, BookOpen } from 'lucide-react';
 
 export const DesignSystemShowcase: React.FC = () => {
+  const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'tokens' | 'components' | 'states' | 'media' | 'docs'>('tokens');
+  const [activeTab, setActiveTab] = useState<'tokens' | 'components' | 'notifications' | 'states' | 'media' | 'docs'>('tokens');
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'docs' || hash === 'architecture-docs') {
+      setActiveTab('docs');
+    } else if (hash === 'notifications') {
+      setActiveTab('notifications');
+    } else if (hash === 'components' || hash === 'ui-components') {
+      setActiveTab('components');
+    } else if (hash === 'states' || hash === 'app-states') {
+      setActiveTab('states');
+    } else if (hash === 'media' || hash === 'image-foundation') {
+      setActiveTab('media');
+    }
+  }, []);
 
   return (
     <Container size="lg" className="flex flex-col gap-12 sm:gap-16">
@@ -39,30 +58,42 @@ export const DesignSystemShowcase: React.FC = () => {
             FRAMELEARN
           </h1>
           <p className="text-body-lg text-white font-medium leading-relaxed">
-            {PROJECT_METADATA.title}. Technical foundation, architecture, and design system initialized cleanly according to strict specification rules.
+            {PROJECT_METADATA.title}. Technical foundation, reusable notification standard, central documentation hub, and interactive portfolio.
           </p>
 
           <div className="pt-4 flex flex-wrap items-center gap-4">
             <Button variant="secondary" onClick={() => setIsModalOpen(true)} leftIcon={<Layers className="w-4 h-4 stroke-[2.5]" />}>
-              Trigger Modal Component Demo
+              Trigger Modal Demo
             </Button>
-            <a href="#architecture-docs">
-              <Button className="btn-outline-hero" size="md">
-                View Architecture Docs
-              </Button>
-            </a>
+            <button
+              type="button"
+              onClick={() => setActiveTab('docs')}
+              className="btn-outline-hero h-11 px-5 rounded-frame font-bold text-body inline-flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4 stroke-[2.5]" />
+              View Documentation Hub
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('notifications')}
+              className="btn-outline-hero h-11 px-5 rounded-frame font-bold text-body inline-flex items-center gap-2"
+            >
+              <Bell className="w-4 h-4 stroke-[2.5]" />
+              Notification Standard
+            </button>
           </div>
         </div>
       </section>
 
       {/* Navigation Tabs for Showcase Sections */}
-      <nav className="flex flex-wrap items-center gap-2 border-b-2 border-sage-400 pb-4">
+      <nav aria-label="Design system showcase tabs" className="flex flex-wrap items-center gap-2 border-b-2 border-sage-400 pb-4">
         {[
           { id: 'tokens', label: '1. Brand Identity & Colors' },
           { id: 'components', label: '2. UI Component Foundation' },
-          { id: 'states', label: '3. Application States' },
-          { id: 'media', label: '4. Image Handling' },
-          { id: 'docs', label: '5. Architecture & Governance' },
+          { id: 'notifications', label: '3. Notification Standard' },
+          { id: 'states', label: '4. Application States' },
+          { id: 'media', label: '5. Image Foundation' },
+          { id: 'docs', label: '6. Central Documentation Hub' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -119,149 +150,119 @@ export const DesignSystemShowcase: React.FC = () => {
             {/* Cream Token */}
             <Card className="flex flex-col justify-between">
               <CardHeader>
-                <div className="h-24 w-full rounded-frame bg-cream border-2 border-sage-300 flex items-center justify-center text-navy-950 font-bold text-h3 shadow-subtle mb-3">
+                <div className="h-24 w-full rounded-frame bg-cream flex items-center justify-center text-navy font-bold text-h3 shadow-subtle border-2 border-navy-800 mb-3">
                   {BRAND_COLORS.CREAM}
                 </div>
                 <CardTitle>Light Cream</CardTitle>
                 <Badge variant="cream" className="w-fit">#EFFBDD</Badge>
               </CardHeader>
               <CardContent className="text-small text-navy-950 font-medium">
-                Used for main light backgrounds, soft section surfaces, and visual breathing space for photography.
+                Used as the default canvas surface, breathable negative space, and soft container surfacing.
               </CardContent>
             </Card>
           </div>
-
-          {/* Typography Scale */}
-          <Card className="p-8 flex flex-col gap-6">
-            <SectionHeading eyebrow="Typography Hierarchy" title="Font Scale & Styles" />
-            <div className="space-y-4 divide-y-2 divide-sage-200">
-              <div className="pt-2">
-                <span className="text-caption font-bold text-navy-900">Display Hero / Title</span>
-                <p className="text-display font-display font-bold text-navy">Outfit Display Bold (3.75rem / 60px)</p>
-              </div>
-              <div className="pt-4">
-                <span className="text-caption font-bold text-navy-900">Heading 1</span>
-                <p className="text-h1 font-display font-bold text-navy">Outfit Heading 1 (2.75rem / 44px)</p>
-              </div>
-              <div className="pt-4">
-                <span className="text-caption font-bold text-navy-900">Heading 2</span>
-                <p className="text-h2 font-display font-bold text-navy">Outfit Heading 2 (2.25rem / 36px)</p>
-              </div>
-              <div className="pt-4">
-                <span className="text-caption font-bold text-navy-900">Heading 3</span>
-                <p className="text-h3 font-display font-bold text-navy">Outfit Heading 3 (1.5rem / 24px)</p>
-              </div>
-              <div className="pt-4">
-                <span className="text-caption font-bold text-navy-900">Body Large</span>
-                <p className="text-body-lg font-medium text-navy-950">Inter Body Large — Crisp, editorial text presentation (1.125rem / 18px)</p>
-              </div>
-              <div className="pt-4">
-                <span className="text-caption font-bold text-navy-900">Small & Caption</span>
-                <p className="text-small font-semibold text-navy-950">Inter Small (0.875rem / 14px) and <span className="text-caption font-bold text-navy">Caption (0.75rem / 12px UPPERCASE)</span></p>
-              </div>
-            </div>
-          </Card>
         </section>
       )}
 
-      {/* SECTION 2: UI COMPONENTS FOUNDATION */}
-      {(activeTab === 'components' || activeTab === 'tokens') && (
+      {/* SECTION 2: UI PRIMITIVES FOUNDATION */}
+      {activeTab === 'components' && (
         <section id="ui-components" className="flex flex-col gap-8">
           <SectionHeading
             eyebrow="Reusable Primitives"
-            title="UI Components Gallery"
-            subtitle="Accessible, accessible-first design system components crafted specifically for FrameLearn."
+            title="14 Core UI Primitives"
+            subtitle="Accessible, typed React primitives built strictly with project tokens and CSS custom properties."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Buttons Showcase */}
+            {/* Buttons Demo */}
             <Card>
               <CardHeader>
-                <CardTitle>Button Primitives</CardTitle>
-                <CardSubtitle>Primary, Secondary, Outline, Ghost, Sizes, and Loading</CardSubtitle>
+                <CardTitle>Buttons & Interactive Actions</CardTitle>
+                <CardSubtitle>High-contrast button variants with icon and loading states</CardSubtitle>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button variant="primary">Primary Navy</Button>
-                  <Button variant="secondary">Secondary Sage</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="ghost">Ghost</Button>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button size="sm">Small</Button>
-                  <Button size="md">Medium</Button>
-                  <Button size="lg">Large Button</Button>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button isLoading>Loading</Button>
-                  <Button disabled>Disabled</Button>
-                </div>
+              <CardContent className="flex flex-wrap gap-3">
+                <Button variant="primary">Primary Navy</Button>
+                <Button variant="secondary">Secondary Sage</Button>
+                <Button variant="outline">Outline</Button>
+                <Button variant="ghost">Ghost</Button>
+                <Button variant="danger">Danger</Button>
+                <Button variant="primary" isLoading>Loading State</Button>
               </CardContent>
             </Card>
 
-            {/* Badges Showcase */}
+            {/* Badges Demo */}
             <Card>
               <CardHeader>
-                <CardTitle>Badge Primitives</CardTitle>
-                <CardSubtitle>Brand color tokens and size variants</CardSubtitle>
+                <CardTitle>Badges & Status Tags</CardTitle>
+                <CardSubtitle>Semantic labels with WCAG-compliant contrast</CardSubtitle>
               </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge variant="navy">Primary Navy</Badge>
-                  <Badge variant="sage">Sage Green</Badge>
-                  <Badge variant="cream">Light Cream</Badge>
-                  <Badge variant="outline">Outline</Badge>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge size="sm">Small Tag</Badge>
-                  <Badge size="md">Medium Tag</Badge>
-                  <Badge size="lg">Large Tag</Badge>
-                </div>
+              <CardContent className="flex flex-wrap gap-2.5 items-center">
+                <Badge variant="navy">Navy Badge</Badge>
+                <Badge variant="sage">Sage Badge</Badge>
+                <Badge variant="cream">Cream Badge</Badge>
+                <Badge variant="outline">Outline Badge</Badge>
+                <Badge variant="navy" size="lg" icon={<Sparkles className="w-4 h-4" />}>
+                  With Icon
+                </Badge>
               </CardContent>
             </Card>
 
-            {/* Form Inputs Showcase */}
+            {/* Form Inputs */}
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Form Controls (Input, Textarea, Select)</CardTitle>
-                <CardSubtitle>Includes labels, helper text, error text, and icons</CardSubtitle>
+                <CardTitle>Form Elements & Data Entry</CardTitle>
+                <CardSubtitle>Accessible controls with labels, focus indicators, and helper texts</CardSubtitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Input
-                  label="Full Name"
-                  placeholder="Ismail Ibrahim Mensah"
-                  leftIcon={<User className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
-                  helperText="Required for upcoming booking forms in future milestones."
+                  label="Client Name"
+                  placeholder="e.g. Ama Mensah"
+                  leftIcon={<User className="w-4 h-4 text-navy stroke-[2.5]" />}
+                  helperText="Standard text input with left icon."
                 />
                 <Input
                   label="Email Address"
                   type="email"
-                  placeholder="ismail@example.com"
-                  leftIcon={<Mail className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
-                  errorText="Sample validation error state demo."
+                  placeholder="client@example.com"
+                  leftIcon={<Mail className="w-4 h-4 text-navy stroke-[2.5]" />}
+                  helperText="Email input control."
                 />
                 <Select
-                  label="Photography Session Type"
+                  label="Photography Discipline"
                   options={[
-                    { label: 'Select session package...', value: '' },
-                    { label: 'Portrait Session', value: 'portrait' },
-                    { label: 'Wedding & Event Photography', value: 'wedding' },
-                    { label: 'Educational Workshop Enrollment', value: 'workshop' },
+                    { value: 'portraits', label: 'Portraits' },
+                    { value: 'weddings', label: 'Weddings & Events' },
+                    { value: 'graduation', label: 'Graduation' },
+                    { value: 'commercial', label: 'Product & Commercial' },
                   ]}
                   helperText="Select component with custom dropdown styling."
                 />
-                <Textarea
-                  label="Inquiry / Message Note"
-                  placeholder="Provide brief details..."
-                  helperText="Textarea control with auto-resize capability."
-                />
+                <div className="md:col-span-3">
+                  <Textarea
+                    label="Inquiry / Message Note"
+                    placeholder="Provide brief session details..."
+                    helperText="Textarea control with auto-resize capability."
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>
         </section>
       )}
 
-      {/* SECTION 3: APPLICATION STATES */}
+      {/* SECTION 3: NOTIFICATION STANDARD DEMO */}
+      {activeTab === 'notifications' && (
+        <section id="notifications" className="flex flex-col gap-8">
+          <SectionHeading
+            eyebrow="Zero-Alert Standard"
+            title="Shared Notification System & Confirmation Dialog"
+            subtitle="Demonstration of multi-type accessible toasts, async operation loading, and pre-action confirmation dialogs."
+          />
+          <NotificationDemo />
+        </section>
+      )}
+
+      {/* SECTION 4: APPLICATION STATES */}
       {(activeTab === 'states' || activeTab === 'tokens') && (
         <section id="app-states" className="flex flex-col gap-8">
           <SectionHeading
@@ -288,20 +289,20 @@ export const DesignSystemShowcase: React.FC = () => {
               />
             </div>
 
-            {/* Error State */}
+            {/* Error State — NO browser alert! Uses toast.info */}
             <div className="flex flex-col gap-2">
               <span className="text-small font-bold text-navy">3. Error State</span>
               <ErrorState
                 title="Database Connection Offline"
                 message="Sample friendly error state demonstration."
-                onRetry={() => alert('Retry action handler executed!')}
+                onRetry={() => toast.info('Sample retry action triggered — verifying network connectivity.')}
               />
             </div>
           </div>
         </section>
       )}
 
-      {/* SECTION 4: IMAGE HANDLING */}
+      {/* SECTION 5: IMAGE HANDLING */}
       {(activeTab === 'media' || activeTab === 'tokens') && (
         <section id="image-foundation" className="flex flex-col gap-8">
           <SectionHeading
@@ -363,40 +364,50 @@ export const DesignSystemShowcase: React.FC = () => {
         </section>
       )}
 
-      {/* SECTION 5: ARCHITECTURE & GOVERNANCE */}
+      {/* SECTION 6: CENTRAL DOCUMENTATION HUB & GOVERNANCE */}
       {(activeTab === 'docs' || activeTab === 'tokens') && (
-        <section id="architecture-docs" className="flex flex-col gap-8">
+        <section id="architecture-docs" className="flex flex-col gap-10">
           <SectionHeading
-            eyebrow="Academic Integrity & Quality"
-            title="Architecture & Milestone Governance"
-            subtitle="Summary of files, documentation hierarchy, and lecturer review gate checklist."
+            eyebrow="Academic Governance & Architecture"
+            title="Central Documentation Hub & Milestone Review Gate"
+            subtitle="Authoritative specifications synchronized directly from repository records, with Markdown export and milestone gate checklists."
           />
 
+          {/* Central Documentation Reader & Exporter */}
+          <DocumentationHub />
+
+          {/* Milestone 001 Completion Checklist & Review Gate */}
           <Card className="p-8 bg-white border-2 border-sage-400">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col gap-4">
                 <h3 className="text-h3 font-display font-bold text-navy flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-navy stroke-[2.5]" />
-                  Milestone 001 Completion Checklist
+                  Milestone Governance Checklist
                 </h3>
                 <ul className="space-y-2.5 text-small font-semibold text-navy-950">
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Fresh project initialized cleanly without legacy code.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    Strict TypeScript & Tailwind CSS brand tokens established.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Strict TypeScript & Tailwind CSS brand tokens established.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    14 reusable UI primitives built & tested with Vitest.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Application Shell (Header, Navigation, Footer) created.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    Zero browser-native alerts rule enforced across all code.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> 14 reusable UI primitives built & tested with Vitest.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    Shared Toast notification system and ConfirmDialog deployed.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> Documentation structure created under `docs/`.
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    Interactive Portfolio with category filtering & Lightbox viewer implemented.
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" /> GitHub Actions CI pipeline configured (`ci.yml`).
+                    <span className="w-2.5 h-2.5 rounded-full bg-sage border border-navy-800" />
+                    Central Documentation Hub integrated with 14 markdown specs and bundle export.
                   </li>
                 </ul>
               </div>
@@ -404,14 +415,14 @@ export const DesignSystemShowcase: React.FC = () => {
               <div className="flex flex-col gap-4 bg-cream p-6 rounded-frame border-2 border-navy-800 shadow-subtle">
                 <h3 className="text-h3 font-display font-bold text-navy flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-navy stroke-[2.5]" />
-                  Lecturer Review Gate Notice
+                  Supervisor Review Gate Notice
                 </h3>
                 <p className="text-small text-navy-950 font-semibold leading-relaxed">
-                  Development is paused at Milestone 001. No business tables, login flows, booking forms, or private gallery delivery features have been prematurely implemented.
+                  Academic review gate in effect. All foundations, notifications, documentation records, and portfolio features are submitted for supervisor sign-off before commencement of Milestone 002.
                 </p>
                 <div className="pt-2">
                   <Badge variant="navy" size="md">
-                    Status: Awaiting Lecturer Approval for Milestone 002
+                    Status: Submitted for Supervisor Review
                   </Badge>
                 </div>
               </div>
@@ -431,7 +442,13 @@ export const DesignSystemShowcase: React.FC = () => {
             <Button variant="ghost" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={() => setIsModalOpen(false)}>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setIsModalOpen(false);
+                toast.success('Modal confirmed action successfully.');
+              }}
+            >
               Confirm Action
             </Button>
           </>

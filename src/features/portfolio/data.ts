@@ -1,0 +1,252 @@
+import { PortfolioCategoryMeta, PortfolioItem } from './types';
+
+export const PORTFOLIO_DISCLAIMER =
+  'Curated sample photography demonstrating platform presentation capabilities. Not commissioned client work.';
+
+export const PORTFOLIO_CATEGORIES: PortfolioCategoryMeta[] = [
+  { id: 'all', label: 'All Works', description: 'Complete curated collection across all photographic disciplines.' },
+  { id: 'portraits', label: 'Portraits', description: 'Studio and environmental portraits highlighting natural personality and expression.' },
+  { id: 'graduation', label: 'Graduation', description: 'Academic milestones, degree convocations, and cap-and-gown commemorative captures.' },
+  { id: 'weddings', label: 'Weddings & Events', description: 'Ceremonial vows, evening receptions, and emotional candid family moments.' },
+  { id: 'outdoor', label: 'Outdoor Photography', description: 'Golden hour landscapes, natural trails, and outdoor environmental framing.' },
+  { id: 'birthdays', label: 'Birthdays & Occasions', description: 'Milestone birthdays, family anniversaries, and personal celebrations.' },
+  { id: 'product', label: 'Product Photography', description: 'Commercial lifestyle shoots, hardware aesthetics, and artisanal craftsmanship.' },
+];
+
+export const PORTFOLIO_ITEMS: PortfolioItem[] = [
+  // 1. Portraits
+  {
+    id: 'port-01',
+    title: 'Studio Lighting Portrait',
+    category: 'portraits',
+    categoryLabel: 'Portraits',
+    src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Studio portrait of a smiling man with clean directional lighting',
+    aspectRatio: '3:2',
+    caption: 'Softbox key light with subtle rim lighting on neutral backdrop.',
+    details: {
+      camera: 'Sony Alpha 7 IV',
+      lens: '85mm f/1.4 GM',
+      lighting: 'Octabox Key + White Reflector',
+      sessionType: 'Studio Portrait Session',
+    },
+  },
+  {
+    id: 'port-02',
+    title: 'Golden Hour Environmental Portrait',
+    category: 'portraits',
+    categoryLabel: 'Portraits',
+    src: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Natural sunlight portrait of a young woman during golden hour',
+    aspectRatio: '3:2',
+    caption: 'Natural ambient backlight balanced with gold fill bounce.',
+    details: {
+      camera: 'Canon EOS R5',
+      lens: '50mm f/1.2L',
+      lighting: 'Natural Golden Hour Backlight',
+      sessionType: 'Outdoor Editorial Portrait',
+    },
+  },
+  {
+    id: 'port-03',
+    title: 'High-Contrast Monochrome Expression',
+    category: 'portraits',
+    categoryLabel: 'Portraits',
+    src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Black and white studio portrait with dramatic chiaroscuro contrast',
+    aspectRatio: '4:3',
+    caption: 'Chiaroscuro lighting emphasizing texture and contour.',
+    details: {
+      camera: 'Fujifilm X-T5',
+      lens: '56mm f/1.2 R WR',
+      lighting: 'Gridded Beauty Dish',
+      sessionType: 'Monochrome Fine Art',
+    },
+  },
+
+  // 2. Graduation
+  {
+    id: 'grad-01',
+    title: 'Academic Success Celebration',
+    category: 'graduation',
+    categoryLabel: 'Graduation',
+    src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Graduating student tossing graduation cap in celebration on university lawn',
+    aspectRatio: '3:2',
+    caption: 'Campus celebration capturing triumphant milestone completion.',
+    details: {
+      camera: 'Sony Alpha 7 IV',
+      lens: '24-70mm f/2.8 GM II',
+      lighting: 'Natural Afternoon Ambient',
+      sessionType: 'University Convocation Session',
+    },
+  },
+  {
+    id: 'grad-02',
+    title: 'Regalia & Degree Commemoration',
+    category: 'graduation',
+    categoryLabel: 'Graduation',
+    src: 'https://images.unsplash.com/photo-1532649538693-f3a2ec1bf8bd?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Graduate in formal gown with diploma ribbon standing near university quad',
+    aspectRatio: '3:2',
+    caption: 'Formal diploma portrait with blurred campus architecture background.',
+    details: {
+      camera: 'Canon EOS R6 Mark II',
+      lens: '70-200mm f/2.8L IS III',
+      lighting: 'Open Shade Ambient with Diffuser',
+      sessionType: 'Formal Regalia Portrait',
+    },
+  },
+
+  // 3. Weddings & Events
+  {
+    id: 'wed-01',
+    title: 'Ceremony Ring Exchange',
+    category: 'weddings',
+    categoryLabel: 'Weddings & Events',
+    src: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Bride and groom exchanging rings at church altar during wedding ceremony',
+    aspectRatio: '3:2',
+    caption: 'Intimate ceremonial vows captured with telephoto framing.',
+    details: {
+      camera: 'Sony Alpha 1',
+      lens: '70-200mm f/2.8 GM OSS II',
+      lighting: 'Available Altar Ambient + Fill',
+      sessionType: 'Wedding Ceremony Document',
+    },
+  },
+  {
+    id: 'wed-02',
+    title: 'Evening Celebration Lights',
+    category: 'weddings',
+    categoryLabel: 'Weddings & Events',
+    src: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Festive wedding reception dance floor with warm bokeh string lights',
+    aspectRatio: '3:2',
+    caption: 'Warm reception bokeh and spontaneous dance floor joy.',
+    details: {
+      camera: 'Sony Alpha 7S III',
+      lens: '35mm f/1.4 GM',
+      lighting: 'Off-Camera Speedlight + Bistro Bulbs',
+      sessionType: 'Reception & Evening Party',
+    },
+  },
+  {
+    id: 'wed-03',
+    title: 'Couples Golden Hour Walk',
+    category: 'weddings',
+    categoryLabel: 'Weddings & Events',
+    src: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Newlywed couple walking hand-in-hand through sunlit meadow',
+    aspectRatio: '4:3',
+    caption: 'Post-ceremony couple portraits in natural scenic parkland.',
+    details: {
+      camera: 'Nikon Z8',
+      lens: '50mm f/1.2 S',
+      lighting: 'Golden Hour Rim Sun',
+      sessionType: 'Post-Ceremony Couple Session',
+    },
+  },
+
+  // 4. Outdoor Photography
+  {
+    id: 'out-01',
+    title: 'Sunset Coastal Horizon',
+    category: 'outdoor',
+    categoryLabel: 'Outdoor Photography',
+    src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Serene sunset ocean waves rolling gently onto sandy beach shoreline',
+    aspectRatio: '3:2',
+    caption: 'Long exposure shoreline emphasizing rhythm and warm sky hues.',
+    details: {
+      camera: 'Nikon Z7 II',
+      lens: '24-70mm f/2.8 S',
+      lighting: 'Natural Dusk Sunset',
+      sessionType: 'Coastal Landscape Exploration',
+    },
+  },
+  {
+    id: 'out-02',
+    title: 'Mountain Trail Mist',
+    category: 'outdoor',
+    categoryLabel: 'Outdoor Photography',
+    src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Moody mountain peaks blanketed in rolling morning mist',
+    aspectRatio: '3:2',
+    caption: 'Early dawn alpine layer study with atmospheric mist.',
+    details: {
+      camera: 'Sony Alpha 7R V',
+      lens: '100-400mm f/4.5-5.6 GM',
+      lighting: 'Dawn Blue Hour',
+      sessionType: 'Alpine Environmental Series',
+    },
+  },
+
+  // 5. Birthdays & Special Occasions
+  {
+    id: 'bday-01',
+    title: 'Milestone Birthday Sparkler',
+    category: 'birthdays',
+    categoryLabel: 'Birthdays & Occasions',
+    src: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Delicious frosted birthday cake topped with berries and lit candles',
+    aspectRatio: '1:1',
+    caption: 'Celebratory cake presentation with glowing candle atmosphere.',
+    details: {
+      camera: 'Canon EOS R5',
+      lens: '35mm f/1.4L II',
+      lighting: 'Candlelight + Ambient Dining Fill',
+      sessionType: 'Private Birthday Dinner',
+    },
+  },
+  {
+    id: 'bday-02',
+    title: 'Festive Toast & Confetti',
+    category: 'birthdays',
+    categoryLabel: 'Birthdays & Occasions',
+    src: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Champagne glasses raised together in a celebratory toast with festive sparkles',
+    aspectRatio: '3:2',
+    caption: 'Toast of friendship and celebration at milestone anniversary.',
+    details: {
+      camera: 'Sony Alpha 7 IV',
+      lens: '24-70mm f/2.8 GM II',
+      lighting: 'Warm Ambient Venue Lights',
+      sessionType: 'Anniversary Celebration',
+    },
+  },
+
+  // 6. Product Photography
+  {
+    id: 'prod-01',
+    title: 'Commercial Camera Gear',
+    category: 'product',
+    categoryLabel: 'Product Photography',
+    src: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Vintage and modern camera lenses arranged precisely on clean studio surface',
+    aspectRatio: '3:2',
+    caption: 'Precision tabletop lighting highlighting mechanical bevels and optics.',
+    details: {
+      camera: 'Hasselblad X2D 100C',
+      lens: 'XCD 90mm f/2.5 V',
+      lighting: 'Dual Stripbox Studio Setup',
+      sessionType: 'Hardware Commercial Catalog',
+    },
+  },
+  {
+    id: 'prod-02',
+    title: 'Artisan Watch Craftsmanship',
+    category: 'product',
+    categoryLabel: 'Product Photography',
+    src: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Minimalist smart watch on textured neutral stone pedestal',
+    aspectRatio: '1:1',
+    caption: 'Minimalist product placement focusing on tactile materials.',
+    details: {
+      camera: 'Canon EOS R5',
+      lens: '100mm f/2.8L Macro IS',
+      lighting: 'Top Diffused Overhead Panel',
+      sessionType: 'Luxury Accessory Lifestyle',
+    },
+  },
+];

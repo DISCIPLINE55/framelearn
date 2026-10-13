@@ -1,4 +1,8 @@
 /**
- * Portfolio Feature Boundary (Planned for Milestone 003)
+ * Portfolio Feature Boundary — Milestone 001-P Interactive Portfolio
  */
-export const PORTFOLIO_FEATURE_CONFIG = { name: 'portfolio', status: 'planned_milestone_003' } as const;
+export * from './types';
+export * from './data';
+export * from './components/CategoryFilter';
+export * from './components/PortfolioLightbox';
+export * from './components/PortfolioGallery';
