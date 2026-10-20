@@ -23,7 +23,7 @@ This log documents Architectural Decision Records (ADRs) and key technical choic
 - **Decision**: Implemented Tailwind CSS configured with approved brand tokens: Primary Navy (`#10212B`), Sage Green (`#8FA464`), and Light Cream (`#EFFBDD`), supplemented by vanilla CSS tokens in `theme.css`.
 - **Consequences**:
   - Total control over visual aesthetics, font pairings (Outfit + Inter), and WCAG AA contrast compliance.
-  - Minimal CSS footprint in production (`dist/assets/*.css` < 30 kB).
+  - Minimal CSS footprint in production (`dist/assets/*.css` < 40 kB).
   - Explicit utility classes guarantee deterministic layout behavior.
 
 ---
@@ -70,3 +70,37 @@ This log documents Architectural Decision Records (ADRs) and key technical choic
 - **Consequences**:
   - Zero extra npm dependencies.
   - Full keyboard accessibility and responsive scaling tailored to FrameLearn's aspect ratio system.
+
+---
+
+## ADR-007: Safe Local Backend Foundation & Strict Zero-Simulation Policy
+- **Date**: October 2026
+- **Status**: Accepted
+- **Context**: Frontend projects often silently substitute fake credentials, mock logins, or simulated database queries when backend configuration is missing, creating a false impression of functional readiness.
+- **Decision**: Implement `isSupabaseConfigured()`. When environment variables are missing or set to placeholder templates, halt unroutable network traffic, display clear instructional setup notices in the UI, and refuse to simulate fake authentication or fake database success.
+- **Consequences**:
+  - Honest operational feedback: the application never claims to be connected or authenticated unless verified.
+  - Zero risk of committing service-role keys or using mock logins as substitutes for real security.
+  - Clear, reproducible developer instructions for setting up live Supabase credentials.
+
+---
+
+## ADR-008: Additive Version-Controlled SQL Migrations with RLS Security Definer Functions
+- **Date**: October 2026
+- **Status**: Accepted
+- **Context**: Ad-hoc database modification via cloud dashboards leads to schema drift between environments and missing audit records.
+- **Decision**: All database schema alterations must be authored as version-controlled, timestamped SQL migrations under `supabase/migrations/` using idempotent DDL. Row Level Security is enforced on all tables, with administrative permissions checked via PostgreSQL security definer function `public.is_admin()`.
+- **Consequences**:
+  - Deterministic and non-destructive schema migrations.
+  - Client personal identifiable information (PII) is shielded at the database layer, independent of frontend code.
+
+---
+
+## ADR-009: Decoupled Public Booking Inquiries from Mandatory User Accounts
+- **Date**: October 2026
+- **Status**: Accepted
+- **Context**: Requiring clients to register an account before submitting a photography inquiry causes significant friction and user abandonment. However, public write access to a database table risks data leakage if reads are unconstrained.
+- **Decision**: Allow public (anonymous) visitors to INSERT booking inquiries into `booking_requests` without creating an account. Concurrently, enforce RLS policies that strictly deny SELECT/UPDATE/DELETE operations to the public, restricting reads exclusively to the authenticated photographer (`is_admin()`).
+- **Consequences**:
+  - Frictionless booking inquiry flow for public prospective clients.
+  - Complete protection of client contact numbers, email addresses, and event notes against unauthorized inspection.

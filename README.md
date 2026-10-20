@@ -22,9 +22,9 @@ FrameLearn is developed strictly following an **incremental milestone gate proce
 REQUIREMENTS → DESIGN → IMPLEMENTATION → TESTING → INTERNAL REVIEW → LECTURER REVIEW → APPROVAL → NEXT MILESTONE
 ```
 
-**Current Milestone**: **MILESTONE 001 — FOUNDATION, ARCHITECTURE & DESIGN SYSTEM** (Completed & Pending Review).
+**Current Milestone**: **MILESTONE 002 — REAL BACKEND FOUNDATION AND PHOTOGRAPHER ACCESS** (Implemented Locally & Tested).
 
-*Note: In accordance with project governance, no business features (Authentication, Bookings, Galleries, Learning, Payments) are implemented in Milestone 001.*
+*Milestone 001 (Foundation, Design System, Notification Standard, and Interactive Portfolio) has been completed and approved by the project supervisor. Milestone 002 establishes the PostgreSQL database schema, Row Level Security policies, Supabase authentication integration, and the protected photographer management portal.*
 
 ---
 

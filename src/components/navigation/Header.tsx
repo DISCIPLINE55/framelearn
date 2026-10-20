@@ -3,7 +3,8 @@ import { PUBLIC_NAV_ITEMS } from '../../constants/navigation';
 import { Container } from '../layout/Container';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Menu, X, Camera, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Menu, X, Camera, ShieldCheck, ArrowRight, Lock } from 'lucide-react';
+import { useAuth } from '../../features/auth/context/AuthContext';
 
 export interface HeaderProps {
   currentRoute?: string;
@@ -13,6 +14,7 @@ export interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ currentRoute = 'home', onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState(currentRoute);
+  const { isAuthenticated, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -76,7 +78,18 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute = 'home', onNavigat
           </nav>
 
           {/* Primary CTA & Lecturer Review Badge */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2.5">
+            <a href="#photographer-portal" onClick={() => handleLinkClick('#photographer-portal')}>
+              {isAuthenticated && isAdmin ? (
+                <Badge variant="sage" size="sm" icon={<Lock className="w-3.5 h-3.5" />}>
+                  Portal Active
+                </Badge>
+              ) : (
+                <Badge variant="outline" size="sm" icon={<Lock className="w-3.5 h-3.5" />} className="text-white border-white/30 hover:bg-navy-800">
+                  Photographer Access
+                </Badge>
+              )}
+            </a>
             <a href="#design-system" onClick={() => handleLinkClick('#design-system')}>
               <Badge variant="cream" size="sm" icon={<ShieldCheck className="w-3.5 h-3.5" />}>
                 Review Area
@@ -115,6 +128,15 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute = 'home', onNavigat
                   <span>{item.label}</span>
                 </a>
               ))}
+
+              <a
+                href="#photographer-portal"
+                onClick={() => handleLinkClick('#photographer-portal')}
+                className="px-4 py-3 rounded-frame text-body font-bold text-white hover:bg-navy-800 hover:text-sage transition-colors flex items-center justify-between"
+              >
+                <span>Photographer Portal</span>
+                <Lock className="w-4 h-4 text-sage" />
+              </a>
 
               <div className="pt-4 mt-2 border-t border-navy-800 flex flex-col gap-2 px-2">
                 <a href="#portfolio" onClick={() => handleLinkClick('#portfolio')} className="w-full">

@@ -28,14 +28,16 @@ Independent creative professionals frequently struggle with fragmented tooling: 
 - **Photographer Management Dashboard**: Single point of administration for appointments, galleries, and content.
 
 ### Current Implementation Boundary:
-- **Completed**: Milestone 001 — Frontend Foundation, strict design system tokens, 14 UI primitives, accessible responsive shell, and CI pipeline.
-- **Active Feature**: Reusable Notification Standard, Central Documentation Hub, and Interactive Portfolio with category filtering and accessible lightbox viewer.
+- **Completed & Approved**: Milestone 001 — Frontend Foundation, strict design system tokens, 14 UI primitives, accessible responsive shell, and CI pipeline.
+- **Completed & Approved**: Milestone 001-F & 001-P — Reusable Notification Standard, Central Documentation Hub, and Interactive Portfolio with category filtering and accessible lightbox viewer.
+- **Active / Implemented Locally**: Milestone 002 — Real Backend Foundation & Photographer Access. Additive PostgreSQL schema migration (`profiles`, `services`, `service_packages`, `booking_requests`, `booking_status_history`), RLS policies, real Supabase Auth session management, and protected photographer portal (`#photographer-portal`).
 - **Explicitly Deferred (Future Milestones)**:
-  - Database-backed user authentication (Milestone 002).
-  - Client booking persistence and scheduling tables (Milestone 004).
-  - Private client proofing galleries with passcodes (Milestone 005).
-  - Course enrollment and LMS tracking (Milestone 006).
-  - Payment gateway processing (Milestone 007+).
+  - Real Photography Services & Package Management *(Milestone 003)*.
+  - Client Booking Engine & scheduling interface *(Milestone 004)*.
+  - Private client proofing galleries with passcodes *(Milestone 005)*.
+  - Course enrollment and LMS tracking *(Milestone 006)*.
+  - Comprehensive CRM dashboard & metrics *(Milestone 007)*.
+  - Payment gateway processing *(Milestone 008)*.
 
 ---
 

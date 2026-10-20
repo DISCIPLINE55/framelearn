@@ -1,17 +1,81 @@
-import { createClient } from '@supabase/supabase-js';
-import { env } from '../../config/env';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { env, isSupabaseConfigured } from '../../config/env';
+import { Database } from '../../types/database';
+
+export interface SupabaseConnectionStatus {
+  configured: boolean;
+  connected: boolean;
+  message: string;
+  error?: string;
+  url?: string;
+}
 
 /**
- * Isolated Supabase Client Foundation.
- * Note: Database tables will be connected in future approved feature milestones.
- * In Milestone 001, this client provides the single-source-of-truth initialization pattern.
+ * Single source of truth Supabase client instance.
+ * Strongly typed against our PostgreSQL database schema.
  */
-const supabaseUrl = env.supabase.url || 'https://placeholder-framelearn.supabase.co';
-const supabaseAnonKey = env.supabase.anonKey || 'placeholder-anon-key';
+const supabaseUrl = isSupabaseConfigured()
+  ? env.supabase.url
+  : 'https://framelearn-unconfigured.supabase.co';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+const supabaseAnonKey = isSupabaseConfigured()
+  ? env.supabase.anonKey
+  : 'unconfigured-anon-key';
+
+export const supabase: SupabaseClient<Database> = createClient<Database>(
+  supabaseUrl,
+  supabaseAnonKey,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);
+
+/**
+ * Actively probes connection to Supabase backend.
+ * Never claims success unless an actual response is received.
+ */
+export const checkSupabaseConnection = async (): Promise<SupabaseConnectionStatus> => {
+  if (!isSupabaseConfigured()) {
+    return {
+      configured: false,
+      connected: false,
+      message:
+        'Supabase backend credentials are not configured. Safe local foundation mode is active.',
+    };
+  }
+
+  try {
+    const { error } = await supabase.auth.getSession();
+    if (error) {
+      return {
+        configured: true,
+        connected: false,
+        url: env.supabase.url,
+        message: 'Supabase project responded with an authentication service error.',
+        error: error.message,
+      };
+    }
+
+    return {
+      configured: true,
+      connected: true,
+      url: env.supabase.url,
+      message: 'Supabase backend connection verified successfully.',
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      configured: true,
+      connected: false,
+      url: env.supabase.url,
+      message: 'Network request to Supabase endpoint failed.',
+      error: message,
+    };
+  }
+};
+
+export { isSupabaseConfigured };

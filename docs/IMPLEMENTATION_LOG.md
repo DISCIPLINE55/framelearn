@@ -6,7 +6,7 @@ This log records verified changes and implementation history. Every entry identi
 
 ## Log Entry 001 — Frontend Foundation & Design System Setup
 - **Feature Name**: Milestone 001 — Frontend Foundation & Design System
-- **Status**: Committed & Deployed (`https://framelearn.vercel.app/`), Awaiting Lecturer Sign-off
+- **Status**: Committed & Deployed (`https://framelearn.vercel.app/`), Approved by Lecturer
 - **Purpose**: Initialize a clean, professional application shell and foundational UI library conforming strictly to approved brand tokens.
 - **Requirements Addressed**: FR-001, FR-002, FR-003, NFR-001, NFR-002, NFR-003
 - **Files Created / Changed**:
@@ -26,7 +26,6 @@ This log records verified changes and implementation history. Every entry identi
   - TypeScript: `tsc --noEmit` exited 0.
   - Production build: `vite build` completed successfully.
 - **Known Limitations**: Static prototype content; business tables and backend auth omitted by design for Milestone 001.
-- **Outstanding Work**: Formal supervisor review and sign-off.
 
 ---
 
@@ -81,3 +80,47 @@ This log records verified changes and implementation history. Every entry identi
   - `src/app/routes/PortfolioPreviewPage.tsx` (updated to host interactive gallery)
 - **Implementation Summary**: Implemented 6 categories: Portraits, Graduation, Weddings and Events, Outdoor Photography, Birthdays and Special Occasions, Product Photography, plus 'All'. Added keyboard-navigable Lightbox (Escape to close, Left/Right arrows to cycle, accessible focus management). Added empty and error states using shared primitives. Added honest disclaimer: sample images demonstrate platform presentation capabilities, not commissioned client work.
 - **Actual Test Results**: Category filtering, keyboard cycling, modal open/close verified.
+
+---
+
+## Log Entry 005 — Real Backend Foundation & Photographer Access
+- **Feature Name**: Milestone 002 — Real Backend Foundation & Photographer Access
+- **Status**: Implemented locally & Tested
+- **Purpose**: Transform FrameLearn from a static UI presentation into a usable photography business platform for independent photographer Arafat Nabuku Jansu. Establishes the authoritative PostgreSQL database schema, Row Level Security policies, typed Supabase client foundation, and secure photographer administration portal.
+- **Requirements Addressed**: FR-100, FR-101, FR-102, FR-103, NFR-001, NFR-004
+- **Files Created / Changed**:
+  - `supabase/migrations/20261020000001_initial_schema.sql` (additive PostgreSQL migration script)
+  - `supabase/migrations/README.md` (database migration standards and inventory)
+  - `src/types/database.ts` (PostgreSQL Database TypeScript definitions and row types)
+  - `src/lib/database/supabase.ts` (repaired client initialization, probe utility, and unconfigured safety)
+  - `src/config/env.ts` (added `isSupabaseConfigured()` and updated validation warnings)
+  - `src/features/auth/types.ts` (authentication state and credential types)
+  - `src/features/auth/context/AuthContext.tsx` (real Supabase authentication provider and session manager)
+  - `src/features/auth/components/PhotographerLoginForm.tsx` (accessible login form with honest backend status feedback)
+  - `src/features/auth/components/ProtectedRoute.tsx` (photographer/admin authorization route guard)
+  - `src/features/auth/index.ts` (auth feature module exports)
+  - `src/app/routes/PhotographerPortalPage.tsx` (photographer control center with schema audit and connection probe)
+  - `src/app/providers/AppProvider.tsx` (integrated `AuthProvider` within `ToastProvider`)
+  - `src/components/navigation/Header.tsx` (integrated photographer access point and active session indicator)
+  - `src/constants/navigation.ts` (exported `PHOTOGRAPHER_NAV_ITEMS` and updated footer navigation)
+  - `src/App.tsx` (added `#photographer-portal`, `#admin`, and `#login` routing)
+  - `tests/unit/SupabaseClient.test.ts` (Supabase configuration and safety tests)
+  - `tests/unit/Auth.test.tsx` (auth context, form validation, and session reset tests)
+  - `tests/unit/ProtectedRoute.test.tsx` (route guard tests for unauthenticated and admin states)
+  - `tests/unit/PhotographerPortal.test.tsx` (photographer workspace, schema audit, and logout confirmation tests)
+  - Authoritative documentation in `docs/`
+- **Implementation Summary**:
+  - Designed normalized relational database schema with 5 entities: `profiles`, `services`, `service_packages`, `booking_requests`, and `booking_status_history`.
+  - Enabled Row Level Security (RLS) across all tables with explicit security policies. Public visitors can submit booking requests without creating an account; client PII (phone, email, event details) is strictly hidden from public reads and accessible only by the authenticated photographer (`is_admin()`).
+  - Added PostgreSQL helper function `public.is_admin()` and automated user provisioning trigger `public.handle_new_user()`.
+  - Seeded 8 canonical photography disciplines for Arafat without inventing fake prices or artificial package structures.
+  - Repaired Supabase client to prevent unroutable requests to placeholder domains; implemented `checkSupabaseConnection()` for active backend probing.
+  - Implemented the protected `#photographer-portal` route with session management, live connection inspection, and accessible `ConfirmDialog` logout flow.
+- **Actual Test Results**:
+  - Vitest: 14 test suites, 45 tests passed.
+  - TypeScript: `tsc --noEmit` exited 0 with zero type errors.
+  - Production build: `vite build` completed successfully.
+- **Known Limitations**:
+  - Live remote Supabase verification requires setting project credentials (`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`) in the local `.env`. Safe local foundation mode is active until credentials are provided.
+- **Outstanding Work**:
+  - Gate review presentation to project lecturer for formal Milestone 002 sign-off.

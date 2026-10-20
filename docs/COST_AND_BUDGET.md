@@ -30,18 +30,18 @@ FrameLearn is developed as a final-year BSc Information Technology Education cap
 ## 3. Estimated Development Effort (Team Hours)
 Estimates based on standard academic term effort allocations (3 team members):
 
-| Milestone | Milestone Deliverable | Estimated Dev Hours | Estimated QA/Doc Hours | Total Effort |
-|---|---|---|---|---|
-| **001** | Foundation & Design System | 40 hrs | 25 hrs | 65 hrs |
-| **001-F** | Notification Standard & Central Docs Hub | 15 hrs | 12 hrs | 27 hrs |
-| **001-P** | Interactive Portfolio & Lightbox | 20 hrs | 15 hrs | 35 hrs |
-| **002** | Authentication & RBAC | 35 hrs | 20 hrs | 55 hrs |
-| **003** | Services & Pricing Catalog | 20 hrs | 12 hrs | 32 hrs |
-| **004** | Client Booking Engine | 45 hrs | 25 hrs | 70 hrs |
-| **005** | Private Client Proofing Galleries | 40 hrs | 25 hrs | 65 hrs |
-| **006** | Learning Hub & Workshops | 35 hrs | 20 hrs | 55 hrs |
-| **007** | Admin & Photographer CRM Dashboard | 50 hrs | 30 hrs | 80 hrs |
-| **008** | E2E Testing & Final Deployment | 25 hrs | 30 hrs | 55 hrs |
+| Milestone | Milestone Deliverable | Estimated Dev Hours | Estimated QA/Doc Hours | Total Effort | Status |
+|---|---|---|---|---|---|
+| **001** | Foundation & Design System | 40 hrs | 25 hrs | 65 hrs | Completed & Approved |
+| **001-F** | Notification Standard & Central Docs Hub | 15 hrs | 12 hrs | 27 hrs | Completed & Approved |
+| **001-P** | Interactive Portfolio & Lightbox | 20 hrs | 15 hrs | 35 hrs | Completed & Approved |
+| **002** | Real Backend Foundation & Photographer Access | 35 hrs | 20 hrs | 55 hrs (Actual: 50 hrs) | Implemented Locally & Tested |
+| **003** | Services & Pricing Catalog | 20 hrs | 12 hrs | 32 hrs | Scheduled |
+| **004** | Client Booking Engine | 45 hrs | 25 hrs | 70 hrs | Scheduled |
+| **005** | Private Client Proofing Galleries | 40 hrs | 25 hrs | 65 hrs | Scheduled |
+| **006** | Learning Hub & Workshops | 35 hrs | 20 hrs | 55 hrs | Scheduled |
+| **007** | Admin & Photographer CRM Dashboard | 50 hrs | 30 hrs | 80 hrs | Scheduled |
+| **008** | E2E Testing & Final Deployment | 25 hrs | 30 hrs | 55 hrs | Scheduled |
 | **Total Projected** | Full Platform Scope | **325 hrs** | **214 hrs** | **539 hrs** |
 
 ---
