@@ -5,7 +5,7 @@ import * as AuthContextModule from '../../src/features/auth/context/AuthContext'
 import { AppProvider } from '../../src/app/providers/AppProvider';
 
 describe('ProtectedRoute Guard Component', () => {
-  it('renders login form when user is not authenticated', () => {
+  it('renders login form when user is not authenticated', async () => {
     render(
       <AppProvider>
         <ProtectedRoute>
@@ -15,10 +15,10 @@ describe('ProtectedRoute Guard Component', () => {
     );
 
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
   });
 
-  it('renders custom fallback when provided and user is not authenticated', () => {
+  it('renders custom fallback when provided and user is not authenticated', async () => {
     render(
       <AppProvider>
         <ProtectedRoute fallback={<div data-testid="custom-fallback">Access Denied</div>}>
@@ -28,7 +28,7 @@ describe('ProtectedRoute Guard Component', () => {
     );
 
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
-    expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
+    expect(await screen.findByTestId('custom-fallback')).toBeInTheDocument();
   });
 
   it('renders protected children when authenticated as admin', () => {

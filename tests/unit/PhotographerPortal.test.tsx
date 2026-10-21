@@ -6,14 +6,14 @@ import * as AuthContextModule from '../../src/features/auth/context/AuthContext'
 import { AppProvider } from '../../src/app/providers/AppProvider';
 
 describe('PhotographerPortalPage Component and Business View', () => {
-  it('renders photographer login form when user is not authenticated', () => {
+  it('renders photographer login form when user is not authenticated', async () => {
     render(
       <AppProvider>
         <PhotographerPortalPage />
       </AppProvider>
     );
 
-    expect(screen.getByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
   });
 
