@@ -156,3 +156,27 @@ This log records verified changes and implementation history. Every entry identi
 - **Next Actions**:
   - User provides publishable anon key in local `.env`.
   - User executes hardened migration `supabase/migrations/20261020000001_initial_schema.sql` in the Supabase Dashboard SQL Editor or links CLI with project owner credentials.
+
+---
+
+## Log Entry 007 — Live Production Supabase Key Configured & Verified
+- **Feature Name**: Milestone 002 — Production Supabase Key Integration & Asynchronous Auth Stabilization
+- **Status**: Implemented locally & Verified against Live Project (`htnquutikqahijrtvjsv`)
+- **Purpose**: Configure the newly provisioned production publishable key (`sb_publishable_...`) in local environment, probe live Supabase Auth and PostgREST endpoints, stabilize asynchronous session hydration in automated test suites, and prepare database schema migration.
+- **Requirements Addressed**: FR-100, FR-101, FR-104, NFR-004, NFR-005
+- **Files Changed**:
+  - `.env` (created and populated with live Supabase URL and publishable key; git-ignored)
+  - `tests/unit/PhotographerPortal.test.tsx` (stabilized with async `findByRole` to await initial auth hydration)
+  - `tests/unit/ProtectedRoute.test.tsx` (stabilized with async `findBy` matchers for unauthenticated boundary states)
+  - `docs/IMPLEMENTATION_LOG.md` (recorded Log Entry 007)
+- **Implementation & Verification Summary**:
+  - **Live Auth Service Verification**: Probed `https://htnquutikqahijrtvjsv.supabase.co/auth/v1/settings` with the new publishable key. Received HTTP 200 OK with authentic project settings confirming key validity.
+  - **Live PostgREST Probing**: Probed `https://htnquutikqahijrtvjsv.supabase.co/rest/v1/services` with the publishable key. Successfully authenticated against PostgREST; endpoint returned `PGRST205` confirming that the API layer is active and ready for the `public.services` table migration.
+  - **Security Hygiene**: Verified `.gitignore` blocks `.env` from git tracking. Working tree is clean of secrets.
+  - **Test Suite Pass**: All 14 test suites and 45 unit tests passed cleanly.
+- **Actual Test Results**:
+  - Vitest: 14 test files passed, 45 tests passed.
+  - TypeScript: `tsc --noEmit` exited 0 with zero errors.
+  - Production build: `vite build` completed successfully.
+- **Immediate Next Step**:
+  - Run the idempotent SQL migration `supabase/migrations/20261020000001_initial_schema.sql` in the Supabase Dashboard SQL Editor (`https://supabase.com/dashboard/project/htnquutikqahijrtvjsv/sql`) to create the 5 core tables and seed the 8 canonical services.
