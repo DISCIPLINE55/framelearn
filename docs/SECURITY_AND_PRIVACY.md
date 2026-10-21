@@ -23,10 +23,11 @@ Security policies are partitioned strictly by authorization tier:
 4. **`booking_status_history`**:
    - `SELECT / INSERT`: Strictly restricted to authenticated administrators (`is_admin()`).
 
-### 2.2 Role-Based Access Control (RBAC)
-- **Security Definer Function**: PostgreSQL function `public.is_admin()` verifies administrator role against `public.profiles` securely without leaking profile tables.
-- **Photographer / Admin**: Possesses authorized management access across booking requests, service definitions, package tiers, and platform settings.
-- **Client & Learner Roles**: Architecture provides role fields in `profiles` for future milestones. No self-assignment of roles is permitted.
+### 2.2 Role-Based Access Control (RBAC) & Privilege Protection
+- **Security Definer Isolation**: All administrative helper and trigger functions (`is_admin`, `handle_new_user`, `protect_profile_role`) strictly declare `SET search_path = public, pg_temp;` to mitigate search-path injection vectors.
+- **Trigger-Enforced Role Immutability**: The `protect_profile_role` trigger intercepts all `UPDATE` queries on `public.profiles`. Any attempt by an authenticated non-admin to alter the `role` column raises an unhandled exception.
+- **Controlled Admin Bootstrapping**: `handle_new_user()` defaults new signups to `'client'`. Admin elevation is restricted to the first profile created in an empty database or the designated photographer address (`arafat@framelearn.com`). Client-supplied signup metadata is discarded.
+- **Client & Learner Data Isolation**: Non-admin users are strictly bounded to their own profile row (`id = auth.uid()`). Public inquiries in `booking_requests` are completely shielded from public read access.
 
 ### 2.3 Route Guard & Protected Gateways
 - Route `#photographer-portal` (and aliases `#admin`, `#login`) is protected by `<ProtectedRoute>`.

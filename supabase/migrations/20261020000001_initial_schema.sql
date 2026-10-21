@@ -1,17 +1,19 @@
 -- =============================================================================
 -- Migration: 20261020000001_initial_schema.sql
--- Description: Core Schema for FrameLearn Photography Platform (Milestone 002)
+-- Description: Hardened Core Schema for FrameLearn Photography Platform (Milestone 002)
 -- Entities: profiles, services, service_packages, booking_requests, booking_status_history
 -- Author: FrameLearn Development Team (Ismail Ibrahim Mensah, Arafat Nabuku Jansu, Janet Antwi)
+-- Security Review: Addressed search_path hijacking, role escalation, and public isolation.
 -- =============================================================================
 
 -- 1. UTILITY FUNCTIONS
 -- -----------------------------------------------------------------------------
 
--- Automatically update updated_at timestamps
+-- Automatically update updated_at timestamps (safe search_path)
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -24,7 +26,7 @@ $$;
 -- Extends auth.users to store role, display name, and contact details.
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('admin', 'client', 'learner')),
+  role TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('admin', 'client', 'learner')),
   full_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT,
@@ -33,7 +35,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Profiles trigger
+-- Profiles updated_at trigger
 DROP TRIGGER IF EXISTS set_profiles_updated_at ON public.profiles;
 CREATE TRIGGER set_profiles_updated_at
   BEFORE UPDATE ON public.profiles
@@ -42,33 +44,74 @@ CREATE TRIGGER set_profiles_updated_at
 
 -- Helper function: is_admin()
 -- Returns true if current authenticated user has the 'admin' role in profiles.
+-- Hardened with SECURITY DEFINER and fixed search_path to prevent hijacking.
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 STABLE
 AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.profiles
-    WHERE id = auth.uid()
-      AND role = 'admin'
+  SELECT COALESCE(
+    (
+      SELECT role = 'admin'
+      FROM public.profiles
+      WHERE id = auth.uid()
+    ),
+    FALSE
   );
 $$;
 
+-- Prevent non-admins from escalating their own or other users' roles
+CREATE OR REPLACE FUNCTION public.protect_profile_role()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role AND NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Security Violation: Only platform administrators can modify user roles.';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_protect_profile_role ON public.profiles;
+CREATE TRIGGER trg_protect_profile_role
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.protect_profile_role();
+
 -- Automatically populate profile on auth.users sign-up
+-- Default role is strictly 'client'. Never trusts client-supplied metadata for role elevation.
+-- Safe bootstrapping: The first user registered or designated photographer email receives 'admin'.
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
+DECLARE
+  is_first_user BOOLEAN;
+  assigned_role TEXT;
 BEGIN
+  -- Check if any profiles exist yet
+  SELECT NOT EXISTS (SELECT 1 FROM public.profiles) INTO is_first_user;
+
+  -- First registered user or authorized photographer email receives admin role
+  IF is_first_user OR LOWER(NEW.email) = 'arafat@framelearn.com' THEN
+    assigned_role := 'admin';
+  ELSE
+    assigned_role := 'client';
+  END IF;
+
   INSERT INTO public.profiles (id, email, full_name, role)
   VALUES (
     NEW.id,
     COALESCE(NEW.email, ''),
-    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Arafat Nabuku Jansu'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'admin')
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Client User'),
+    assigned_role
   )
   ON CONFLICT (id) DO UPDATE
     SET email = EXCLUDED.email,
@@ -184,7 +227,7 @@ CREATE TABLE IF NOT EXISTS public.booking_status_history (
   from_status TEXT,
   to_status TEXT NOT NULL,
   note TEXT,
-  changed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  changed_by UUID DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -208,13 +251,21 @@ CREATE POLICY "profiles_select_own_or_admin"
   TO authenticated
   USING (id = auth.uid() OR public.is_admin());
 
--- Authenticated users can update their own non-role profile details; admins can update all
-CREATE POLICY "profiles_update_own_or_admin"
+-- Users can update their own profile details (role escalation prevented by trigger)
+CREATE POLICY "profiles_update_own"
   ON public.profiles
   FOR UPDATE
   TO authenticated
-  USING (id = auth.uid() OR public.is_admin())
-  WITH CHECK (id = auth.uid() OR public.is_admin());
+  USING (id = auth.uid())
+  WITH CHECK (id = auth.uid());
+
+-- Administrators can update any profile
+CREATE POLICY "profiles_update_admin"
+  ON public.profiles
+  FOR UPDATE
+  TO authenticated
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
 
 -- 7.2 SERVICES POLICIES
 -- Public (anonymous + authenticated) can view active services
@@ -245,12 +296,20 @@ CREATE POLICY "services_admin_delete"
   USING (public.is_admin());
 
 -- 7.3 SERVICE_PACKAGES POLICIES
--- Public can view active packages of active services
+-- Public can view active packages IF parent service is also active
 CREATE POLICY "service_packages_select_public"
   ON public.service_packages
   FOR SELECT
   TO public
-  USING (is_active = TRUE OR public.is_admin());
+  USING (
+    (
+      is_active = TRUE AND EXISTS (
+        SELECT 1 FROM public.services s
+        WHERE s.id = service_packages.service_id
+          AND s.is_active = TRUE
+      )
+    ) OR public.is_admin()
+  );
 
 -- Only admins can manage service packages
 CREATE POLICY "service_packages_admin_insert"
@@ -321,7 +380,31 @@ CREATE POLICY "booking_history_admin_insert"
   TO authenticated
   WITH CHECK (public.is_admin());
 
--- 8. CANONICAL PHOTOGRAPHY SERVICES SEED (IDEMPOTENT)
+-- 8. PERMISSIONS & GRANTS
+-- -----------------------------------------------------------------------------
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO anon, authenticated, service_role;
+
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.handle_updated_at() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.protect_profile_role() FROM PUBLIC;
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+
+GRANT SELECT ON public.services TO anon, authenticated;
+GRANT ALL ON public.services TO authenticated;
+
+GRANT SELECT ON public.service_packages TO anon, authenticated;
+GRANT ALL ON public.service_packages TO authenticated;
+
+GRANT INSERT ON public.booking_requests TO anon, authenticated;
+GRANT SELECT, UPDATE, DELETE ON public.booking_requests TO authenticated;
+
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+
+GRANT SELECT, INSERT ON public.booking_status_history TO authenticated;
+
+-- 9. CANONICAL PHOTOGRAPHY SERVICES SEED (IDEMPOTENT)
 -- -----------------------------------------------------------------------------
 -- Real service disciplines for Arafat Nabuku Jansu.
 -- Pricing details are not invented; they will be defined in Milestone 003.

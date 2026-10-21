@@ -165,3 +165,29 @@ The initial migration idempotently registers Arafat Nabuku Jansu's 8 service dis
 1. **Client PII Shielding**: Client booking inquiries contain personal email addresses and telephone numbers. Under no circumstances does the frontend expose a public select query against `booking_requests`.
 2. **Zero In-Repo Credentials**: All production keys and database passwords must reside in host environment variables or private secret vaults.
 3. **Additive Migrations**: Schema alterations must use version-controlled SQL files under `supabase/migrations/` prefixed with timestamps. Destructive drop scripts are strictly prohibited.
+
+---
+
+## 7. Migration Security Hardening Audit (Verified Changes)
+
+Prior to deployment to production project `htnquutikqahijrtvjsv`, an exhaustive SQL security review of `supabase/migrations/20261020000001_initial_schema.sql` was conducted. The following critical security fixes were implemented:
+
+1. **Elimination of Signup Privilege Escalation**:
+   - *Previous state*: `handle_new_user()` used `COALESCE(NEW.raw_user_meta_data->>'role', 'admin')`.
+   - *Security vulnerability*: Any user signing up could assign themselves the `admin` role by submitting client-side metadata or relying on the unparameterized default.
+   - *Remediation*: Default role is strictly `'client'`. Admin provisioning is restricted exclusively to the first registered user (`SELECT NOT EXISTS (SELECT 1 FROM public.profiles)`) or the designated photographer email (`arafat@framelearn.com`). Client-supplied role metadata is completely ignored.
+2. **Role Escalation Protection Trigger (`protect_profile_role`)**:
+   - *Previous state*: User profile update policy allowed users to update their own row without preventing modification of the `role` column.
+   - *Security vulnerability*: A malicious user could send `role = 'admin'` in an update query.
+   - *Remediation*: Implemented the `protect_profile_role` trigger (`BEFORE UPDATE ON public.profiles`) which aborts with an exception if a non-administrator attempts to alter the `role` field.
+3. **Search Path Hijacking Protection**:
+   - *Previous state*: `SECURITY DEFINER` functions did not declare a fixed search path.
+   - *Security vulnerability*: A malicious actor could create objects in schemas earlier in the search path to hijack execution.
+   - *Remediation*: Enforced `SET search_path = public, pg_temp;` on `is_admin()`, `handle_new_user()`, `handle_updated_at()`, and `protect_profile_role()`.
+4. **Cascading Service Package Visibility**:
+   - *Previous state*: Public could view any package with `is_active = TRUE`.
+   - *Remediation*: Policy now requires both `is_active = TRUE` and that the parent service is active (`s.is_active = TRUE`), ensuring that archiving a service automatically isolates its packages.
+5. **Audit Attribution**:
+   - Enforced `booking_status_history.changed_by` default to `auth.uid()`.
+6. **Explicit Schema Grants**:
+   - Revoked public execution grants on internal triggers and helper functions; explicitly granted only required table permissions to `anon` and `authenticated`.

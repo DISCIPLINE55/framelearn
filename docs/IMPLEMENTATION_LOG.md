@@ -124,3 +124,35 @@ This log records verified changes and implementation history. Every entry identi
   - Live remote Supabase verification requires setting project credentials (`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`) in the local `.env`. Safe local foundation mode is active until credentials are provided.
 - **Outstanding Work**:
   - Gate review presentation to project lecturer for formal Milestone 002 sign-off.
+
+---
+
+## Log Entry 006 — Production Supabase Setup & SQL Migration Hardening
+- **Feature Name**: Milestone 002 — Production Supabase Project Setup & Security Hardening
+- **Status**: Implemented locally & Tested (Security Hardening Complete, Production Project Coordinates Configured)
+- **Purpose**: Conduct in-depth security review of initial database migration, eliminate potential privilege escalation vulnerabilities, configure target coordinates for production Supabase project (`htnquutikqahijrtvjsv`), and verify endpoint reachability.
+- **Requirements Addressed**: FR-100, FR-102, FR-103, FR-104, NFR-004, NFR-005
+- **Files Changed**:
+  - `supabase/migrations/20261020000001_initial_schema.sql` (hardened trigger, fixed search_path, added role protection trigger, refined RLS, and added explicit grants)
+  - `supabase/config.toml` (linked project_id to `htnquutikqahijrtvjsv`)
+  - `.env.example` (documented production project endpoint `https://htnquutikqahijrtvjsv.supabase.co`)
+  - Authoritative documentation in `docs/`
+- **Implementation Summary**:
+  - **Security Review & Vulnerability Remediation**:
+    1. *Privilege Escalation on User Signup*: Remediated vulnerability in `handle_new_user()` where `raw_user_meta_data->>'role'` was previously trusted. Default role is strictly `'client'`. Admin provisioning is restricted to the first user or designated photographer email (`arafat@framelearn.com`).
+    2. *Role Elevation on Profile Updates*: Added `protect_profile_role()` trigger enforcing that only admins can modify `profiles.role`.
+    3. *Search Path Hijacking*: Added `SET search_path = public, pg_temp;` to all `SECURITY DEFINER` functions (`is_admin`, `handle_new_user`, `protect_profile_role`) and triggers to prevent schema injection attacks.
+    4. *Cascading Service Package Visibility*: Updated `service_packages_select_public` RLS policy to require active parent service (`is_active = TRUE`) before public visibility is granted.
+    5. *Audit Log Attribution*: Configured `booking_status_history.changed_by` to default automatically to `auth.uid()`.
+    6. *Explicit Permissions & Grants*: Added explicit `GRANT` and `REVOKE` statements, restricting public execution on internal security functions.
+  - **Remote Connectivity Verification**:
+    - Probed `https://htnquutikqahijrtvjsv.supabase.co/auth/v1/health` and verified that remote host is live and operational (returned HTTP 401 Unauthorized as expected without API key).
+    - Verified Supabase CLI access: Currently authenticated CLI session belongs to organization `DisciNet org` (`bsrkkbdnkmbkhbvpgxgp`), which lacks administrative permissions for project `htnquutikqahijrtvjsv`.
+    - Documented required publishable key (`anon`) to be placed in local `.env` and direct SQL migration application via Supabase SQL Editor / CLI.
+- **Actual Test Results**:
+  - 14 test suites, 45 tests passed.
+  - `tsc --noEmit` exited 0 with zero type errors.
+  - Production build completed successfully.
+- **Next Actions**:
+  - User provides publishable anon key in local `.env`.
+  - User executes hardened migration `supabase/migrations/20261020000001_initial_schema.sql` in the Supabase Dashboard SQL Editor or links CLI with project owner credentials.

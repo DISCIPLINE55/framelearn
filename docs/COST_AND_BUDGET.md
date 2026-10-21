@@ -22,7 +22,7 @@ FrameLearn is developed as a final-year BSc Information Technology Education cap
 | Service | Plan / Tier | Verified Allowance | Over-Quota Risk & Notes |
 |---|---|---|---|
 | **Vercel** | Hobby (Free) | 100 GB bandwidth / month, automated preview deployments | Commercial usage prohibited on Hobby tier; transition to Pro required if monetized. |
-| **Supabase** | Free Tier | Up to 500 MB database space, 1 GB file storage, 50,000 monthly active users | Free projects are paused after 7 days of inactivity; manual unpausing or Pro upgrade needed. |
+| **Supabase** | Free Tier (`htnquutikqahijrtvjsv`, eu-west-1) | Up to 500 MB database space, 1 GB file storage, 50,000 monthly active users, quoted creation cost $0/mo | Inactive free projects are paused after 7 days; requires Pro ($25/mo) if uninterrupted uptime and backups are required. |
 | **GitHub** | Free | 2,000 Action minutes / month (public repos unlimited for standard runners) | Sufficient for ongoing development and automated CI runs. |
 
 ---

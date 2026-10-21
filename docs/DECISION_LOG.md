@@ -104,3 +104,21 @@ This log documents Architectural Decision Records (ADRs) and key technical choic
 - **Consequences**:
   - Frictionless booking inquiry flow for public prospective clients.
   - Complete protection of client contact numbers, email addresses, and event notes against unauthorized inspection.
+
+---
+
+## ADR-010: Database Migration Security Hardening & Safe Role Bootstrapping
+- **Date**: October 2026
+- **Status**: Accepted
+- **Context**: During the pre-application security review of the initial database migration, two critical privilege escalation vulnerabilities and a search-path hijacking risk were identified:
+  1. `handle_new_user()` accepted `raw_user_meta_data->>'role'`, enabling arbitrary admin self-assignment at signup.
+  2. The profile update RLS policy permitted users to update their own row without preventing modification of the `role` column.
+  3. `SECURITY DEFINER` functions lacked a pinned `search_path`.
+- **Decision**: Remediate all three vectors prior to applying the migration:
+  1. Enforce default role as `'client'` in `handle_new_user()`, completely ignoring client-supplied role metadata. Provision the `'admin'` role only for the very first user registered in an empty database or the designated photographer address (`arafat@framelearn.com`).
+  2. Implement a dedicated `protect_profile_role` PostgreSQL trigger (`BEFORE UPDATE ON public.profiles`) that raises an unhandled exception if a non-administrator attempts to alter the `role` column.
+  3. Enforce `SET search_path = public, pg_temp;` on all `SECURITY DEFINER` functions (`is_admin`, `handle_new_user`, `protect_profile_role`) and trigger procedures.
+- **Consequences**:
+  - Defense-in-depth security enforced at the PostgreSQL database engine level.
+  - Zero possibility of client-side role elevation through signup payloads or profile update calls.
+  - Immune to schema search-path injection attacks.
