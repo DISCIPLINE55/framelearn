@@ -180,3 +180,26 @@ This log records verified changes and implementation history. Every entry identi
   - Production build: `vite build` completed successfully.
 - **Immediate Next Step**:
   - Run the idempotent SQL migration `supabase/migrations/20261020000001_initial_schema.sql` in the Supabase Dashboard SQL Editor (`https://supabase.com/dashboard/project/htnquutikqahijrtvjsv/sql`) to create the 5 core tables and seed the 8 canonical services.
+
+---
+
+## Log Entry 008 — Production Database Migration Applied & Verified
+- **Feature Name**: Milestone 002 — Production PostgreSQL Schema Migration & Verification
+- **Status**: Live on Production Supabase (`htnquutikqahijrtvjsv`) & Fully Verified
+- **Purpose**: Validate successful execution of `20261020000001_initial_schema.sql` on the live Supabase PostgreSQL database, confirm creation and health of all 5 entities, probe RLS enforcement, and verify seeding of all 8 canonical photography services.
+- **Requirements Addressed**: FR-100, FR-101, FR-102, FR-103, FR-104, NFR-004, NFR-005
+- **Verified Production Database Entities**:
+  1. `public.services`: Active with **8 canonical photography services** seeded (`portrait-photography`, `graduation-photography`, `weddings-and-events`, `outdoor-photography`, `birthdays-and-celebrations`, `product-photography`, `retouching-and-editing`, `photography-training`). Public read returns HTTP 200 OK with 8 items sorted by `sort_order`.
+  2. `public.service_packages`: Active with 0 items (reserved for Milestone 003). Public read permitted only when parent service is active.
+  3. `public.booking_requests`: Active. Public read blocked by RLS (returns 0 rows to anonymous visitors). Public insert validation enforced: invalid payload returned HTTP 401 with PostgreSQL error `42501` (`new row violates row-level security policy for table "booking_requests"`), verifying that data sanitization checks and client PII isolation are actively enforced.
+  4. `public.profiles`: Active with RLS enabled. Client metadata role escalation blocked by `protect_profile_role` trigger. Automatic admin role bootstrap configured in `handle_new_user` for `arafat@framelearn.com`.
+  5. `public.booking_status_history`: Active with RLS enabled and automatic `auth.uid()` attribution.
+- **Client & Tooling Verification**:
+  - Direct `@supabase/supabase-js` client probe returned `{ count: 8 }` services and clean session initialization.
+  - Automated unit test suite: 14/14 test files passed, 45/45 tests passed.
+  - TypeScript compilation: zero errors.
+  - Production build: clean compilation.
+- **Milestone 002 Gate Status**:
+  - **Milestone 002 is fully implemented and live on production backend.**
+  - Ready for academic gate review by the Project Lecturer prior to commencing Milestone 003.
+
