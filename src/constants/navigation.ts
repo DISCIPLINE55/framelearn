@@ -16,8 +16,14 @@ export const FOOTER_PRODUCT_ITEMS: NavigationItem[] = [
   { id: 'learning', label: 'Learning Hub', href: '#learning' },
   { id: 'about', label: 'About FrameLearn', href: '#about' },
   { id: 'contact', label: 'Contact FrameLearn', href: '#contact' },
+  { id: 'photographer-portal', label: 'Photographer Portal', href: '#photographer-portal' },
 ];
 
 export const REVIEW_NAV_ITEMS: NavigationItem[] = [
   { id: 'design-system', label: 'Design System & Review Area', href: '#design-system' },
 ];
+
+export const PHOTOGRAPHER_NAV_ITEMS: NavigationItem[] = [
+  { id: 'photographer-portal', label: 'Photographer Portal', href: '#photographer-portal' },
+];
+

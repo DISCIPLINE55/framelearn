@@ -8,6 +8,7 @@ import { LearningPreviewPage } from './app/routes/LearningPreviewPage';
 import { AboutPage } from './app/routes/AboutPage';
 import { ContactPage } from './app/routes/ContactPage';
 import { DesignSystemShowcase } from './app/routes/DesignSystemShowcase';
+import { PhotographerPortalPage } from './app/routes/PhotographerPortalPage';
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>('home');
@@ -35,6 +36,11 @@ export const App: React.FC = () => {
         return <AboutPage />;
       case 'contact':
         return <ContactPage />;
+      case 'photographer-portal':
+      case 'portal':
+      case 'login':
+      case 'admin':
+        return <PhotographerPortalPage />;
       case 'design-system':
       case 'docs':
       case 'components':
