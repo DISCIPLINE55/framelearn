@@ -30,10 +30,15 @@ This directory stores version-controlled, additive SQL migration scripts for the
 FrameLearn enforces strict least privilege. The public signup trigger never assigns the `'admin'` role:
 1. The photographer creates an account via the photographer login / signup interface or receives an invite from the Supabase Auth Dashboard (`Authentication > Users > Add User`).
 2. The trigger `public.handle_new_user()` provisions their profile with the default role `'client'`.
-3. An authorized database owner elevates the account to administrator by running a single targeted statement in the Supabase Dashboard SQL Editor:
+3. An authorized database owner elevates the account to administrator by executing either the controlled provisioning procedure or direct SQL in the Supabase Dashboard SQL Editor:
    ```sql
+   -- Option A: Dedicated provisioning procedure (verifies record existence)
+   SELECT public.assign_admin_role('photographer-email@framelearn.com');
+
+   -- Option B: Direct targeted UPDATE (authorized for session_user = postgres)
    UPDATE public.profiles
    SET role = 'admin'
    WHERE email = 'photographer-email@framelearn.com';
    ```
-4. Never create default administrative accounts with hardcoded passwords.
+4. Role protection triggers (`trg_protect_profile_role`) strictly permit role changes from `session_user IN ('postgres', 'supabase_admin')`, `service_role`, or verified administrators, while completely rejecting unauthorized elevation from ordinary client application requests.
+5. Never create default administrative accounts with hardcoded passwords.

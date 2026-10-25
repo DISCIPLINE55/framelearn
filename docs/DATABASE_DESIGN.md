@@ -202,10 +202,11 @@ Applied via version-controlled migration `supabase/migrations/20261025000001_m00
    - Removed the first-registered-user promotion rule (`is_first_user`).
    - Removed the hardcoded email promotion rule (`LOWER(NEW.email) = 'arafat@framelearn.com'`).
    - Public registrations unconditionally receive `'client'`. Administrator provisioning requires an authorized database owner to update the profile explicitly.
-2. **SECURITY DEFINER Function ACL Hardening**:
+2. **SECURITY DEFINER Function ACL Hardening & Controlled Provisioning**:
    - `public.handle_new_user()`: Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Granted exclusively to `supabase_auth_admin`, `service_role`, and `postgres`.
-   - `public.protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Granted to `authenticated` (for trigger evaluation on profile updates), `service_role`, and `postgres`.
-   - `public.is_admin()`: Execution revoked from `PUBLIC` and `anon`. Granted to `authenticated`, `service_role`, and `postgres`.
+   - `public.protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Permitted for `session_user IN ('postgres', 'supabase_admin')`, `service_role`, or verified administrators via `is_admin()`, while strictly blocking role escalation attempts from client application requests.
+   - `public.assign_admin_role(target_email text)`: Dedicated administrative procedure for establishing the photographer administrator. Revoked from `PUBLIC`, `anon`, and `authenticated`; granted exclusively to `postgres` (Dashboard SQL Editor) and `service_role`.
+   - `public.is_admin()`: Execution revoked from `PUBLIC` and `anon`. Granted to `authenticated`, `service_role`, and `postgres`. Recognizes `auth.role() = 'service_role'` as administrative context.
 3. **Covering Indexes on Foreign Keys (Performance Advisor Remediation)**:
    - Added `idx_booking_requests_package_id` on `public.booking_requests(package_id)`.
    - Added `idx_booking_status_history_changed_by` on `public.booking_status_history(changed_by)`.
@@ -216,5 +217,5 @@ Applied via version-controlled migration `supabase/migrations/20261025000001_m00
 5. **Retention Justification for Unused Indexes**:
    - Indexes on slugs, active states, and timestamps currently report 0 scans due to minimal pre-production traffic. They are retained because they provide necessary indexed lookups for Milestone 003 filtering and Milestone 004 booking workflows.
 6. **Migration History Reconciliation**:
-   - Reconciles `supabase_migrations.schema_migrations` with versions `20261020000001` and `20261025000001`.
+   - Reconciles `supabase_migrations.schema_migrations` with versions `20261020000001` and `20261025000001` without fabricating tables.
 

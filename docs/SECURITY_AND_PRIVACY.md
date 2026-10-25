@@ -30,8 +30,9 @@ Security policies are partitioned strictly by authorization tier:
 - **Trigger-Enforced Role Immutability**: The `protect_profile_role()` trigger intercepts all `UPDATE` queries on `public.profiles`. Any attempt by an authenticated non-admin or profile owner to alter the `role` column raises a security exception.
 - **Function Execution Privilege Hardening**:
   - `handle_new_user()`: Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Callable solely by `supabase_auth_admin`, `service_role`, and `postgres`.
-  - `protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Callable by `authenticated` (for profile updates evaluated by the trigger), `service_role`, and `postgres`.
-  - `is_admin()`: Execution revoked from `PUBLIC` and `anon`. Accessible to `authenticated` for RLS evaluations.
+  - `protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Permitted for `session_user IN ('postgres', 'supabase_admin')`, `service_role`, or verified administrators via `is_admin()`, while strictly blocking role escalation attempts from client application requests.
+  - `assign_admin_role(text)`: Dedicated administrative procedure for establishing the photographer administrator. Execution revoked from `PUBLIC`, `anon`, and `authenticated`; granted exclusively to `postgres` (Dashboard SQL Editor) and `service_role`.
+  - `is_admin()`: Execution revoked from `PUBLIC` and `anon`. Accessible to `authenticated` for RLS evaluations and recognizes `service_role` context.
   - All security-definer functions declare `SET search_path = public, pg_temp;` to mitigate search-path hijacking.
 - **Client & Learner Data Isolation**: Non-admin users are strictly bounded to their own profile row (`id = (SELECT auth.uid())`). Public inquiries in `booking_requests` and audit entries in `booking_status_history` are completely shielded from public read access.
 

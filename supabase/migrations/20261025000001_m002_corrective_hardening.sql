@@ -59,6 +59,8 @@ CREATE TRIGGER on_auth_user_created
 -- -----------------------------------------------------------------------------
 -- Enforces that only verified platform administrators can alter user roles.
 -- Profile owners cannot change or elevate their own role.
+-- Supports direct database maintenance by PostgreSQL superuser / Dashboard SQL Editor
+-- and authorized service_role operations while blocking ordinary application requests.
 CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -66,7 +68,23 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 BEGIN
-  IF NEW.role IS DISTINCT FROM OLD.role AND NOT public.is_admin() THEN
+  IF NEW.role IS DISTINCT FROM OLD.role THEN
+    -- 1. Allow direct maintenance operations by PostgreSQL superuser / Dashboard operator
+    IF session_user IN ('postgres', 'supabase_admin') THEN
+      RETURN NEW;
+    END IF;
+
+    -- 2. Allow administrative service-role operations (backend / edge functions with service_role key)
+    IF (SELECT auth.role()) = 'service_role' THEN
+      RETURN NEW;
+    END IF;
+
+    -- 3. Allow verified administrator accounts operating through the application
+    IF public.is_admin() THEN
+      RETURN NEW;
+    END IF;
+
+    -- 4. Otherwise, strictly reject unauthorized role modification
     RAISE EXCEPTION 'Security Violation: Only platform administrators can modify user roles.';
   END IF;
   RETURN NEW;
@@ -80,9 +98,41 @@ CREATE TRIGGER trg_protect_profile_role
   EXECUTE FUNCTION public.protect_profile_role();
 
 -- -----------------------------------------------------------------------------
--- 3. HARDEN is_admin() FUNCTION
+-- 3. CONTROLLED ADMINISTRATOR PROVISIONING FUNCTION (assign_admin_role)
+-- -----------------------------------------------------------------------------
+-- Provides a dedicated administrative procedure for establishing the photographer admin.
+-- Revoked from PUBLIC, anon, and authenticated to prevent unauthorized RPC execution.
+-- Executable ONLY by postgres (Dashboard SQL Editor) and service_role.
+CREATE OR REPLACE FUNCTION public.assign_admin_role(target_email text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_updated integer;
+BEGIN
+  IF target_email IS NULL OR trim(target_email) = '' THEN
+    RAISE EXCEPTION 'Target email cannot be empty.';
+  END IF;
+
+  UPDATE public.profiles
+  SET role = 'admin',
+      updated_at = NOW()
+  WHERE lower(email) = lower(trim(target_email));
+
+  GET DIAGNOSTICS v_updated = ROW_COUNT;
+  IF v_updated = 0 THEN
+    RAISE EXCEPTION 'No profile found with email: %', target_email;
+  END IF;
+END;
+$$;
+
+-- -----------------------------------------------------------------------------
+-- 4. HARDEN is_admin() FUNCTION
 -- -----------------------------------------------------------------------------
 -- Authoritative check against verified database profile row.
+-- Service-role key callers are recognized as platform administration.
 -- Missing or invalid profiles return FALSE.
 -- Anonymous visitors (auth.uid() IS NULL) return FALSE.
 -- Optimized with (SELECT auth.uid()) to support query planner initPlan caching.
@@ -93,14 +143,17 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 STABLE
 AS $$
-  SELECT COALESCE(
-    (
-      SELECT role = 'admin'
-      FROM public.profiles
-      WHERE id = (SELECT auth.uid())
-    ),
-    FALSE
-  );
+  SELECT CASE
+    WHEN (SELECT auth.role()) = 'service_role' THEN TRUE
+    ELSE COALESCE(
+      (
+        SELECT role = 'admin'
+        FROM public.profiles
+        WHERE id = (SELECT auth.uid())
+      ),
+      FALSE
+    )
+  END;
 $$;
 
 -- -----------------------------------------------------------------------------
@@ -124,6 +177,13 @@ GRANT EXECUTE ON FUNCTION public.protect_profile_role() TO authenticated, servic
 REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.is_admin() FROM anon;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role, postgres;
+
+-- assign_admin_role is an administrative-only provisioning procedure.
+-- Strictly revoke from PUBLIC, anon, and authenticated to prevent unauthorized RPC invocation.
+REVOKE ALL ON FUNCTION public.assign_admin_role(text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.assign_admin_role(text) FROM anon;
+REVOKE ALL ON FUNCTION public.assign_admin_role(text) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.assign_admin_role(text) TO postgres, service_role;
 
 -- handle_updated_at trigger function
 REVOKE ALL ON FUNCTION public.handle_updated_at() FROM PUBLIC;
