@@ -14,6 +14,8 @@
 --   7. Safely registers migration history in supabase_migrations.schema_migrations if table exists
 -- =============================================================================
 
+BEGIN;
+
 -- -----------------------------------------------------------------------------
 -- 1. HARDEN ADMINISTRATOR PROVISIONING (handle_new_user)
 -- -----------------------------------------------------------------------------
@@ -30,19 +32,23 @@ BEGIN
   -- Strict least-privilege principle:
   -- All signups unconditionally receive the 'client' role.
   -- Administrative provisioning must occur through an authorized administrative workflow.
-  INSERT INTO public.profiles (id, email, full_name, role)
+  INSERT INTO public.profiles (id, email, full_name, role, avatar_url, phone)
   VALUES (
     NEW.id,
     COALESCE(NEW.email, ''),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Client User'),
-    'client'
+    'client',
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.raw_user_meta_data->>'phone'
   )
   ON CONFLICT (id) DO UPDATE
     SET email = EXCLUDED.email,
         full_name = CASE
           WHEN profiles.full_name IS NULL OR profiles.full_name = '' THEN EXCLUDED.full_name
           ELSE profiles.full_name
-        END;
+        END,
+        avatar_url = COALESCE(profiles.avatar_url, EXCLUDED.avatar_url),
+        phone = COALESCE(profiles.phone, EXCLUDED.phone);
   RETURN NEW;
 END;
 $$;
@@ -93,7 +99,7 @@ $$;
 
 DROP TRIGGER IF EXISTS trg_protect_profile_role ON public.profiles;
 CREATE TRIGGER trg_protect_profile_role
-  BEFORE UPDATE ON public.profiles
+  BEFORE UPDATE OF role ON public.profiles
   FOR EACH ROW
   EXECUTE FUNCTION public.protect_profile_role();
 
@@ -103,6 +109,7 @@ CREATE TRIGGER trg_protect_profile_role
 -- Provides a dedicated administrative procedure for establishing the photographer admin.
 -- Revoked from PUBLIC, anon, and authenticated to prevent unauthorized RPC execution.
 -- Executable ONLY by postgres (Dashboard SQL Editor) and service_role.
+-- Validates input format, verifies unambiguous single-record match, and protects data integrity.
 CREATE OR REPLACE FUNCTION public.assign_admin_role(target_email text)
 RETURNS void
 LANGUAGE plpgsql
@@ -110,21 +117,35 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-  v_updated integer;
+  v_count integer;
+  v_clean_email text;
 BEGIN
   IF target_email IS NULL OR trim(target_email) = '' THEN
     RAISE EXCEPTION 'Target email cannot be empty.';
   END IF;
 
+  v_clean_email := lower(trim(target_email));
+
+  -- Validate standard email format
+  IF v_clean_email !~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+    RAISE EXCEPTION 'Invalid target email address format: %', target_email;
+  END IF;
+
+  -- Verify match count to prevent missing or ambiguous multi-row promotions
+  SELECT count(*) INTO v_count
+  FROM public.profiles
+  WHERE lower(email) = v_clean_email;
+
+  IF v_count = 0 THEN
+    RAISE EXCEPTION 'No profile found with email: %', target_email;
+  ELSIF v_count > 1 THEN
+    RAISE EXCEPTION 'Ambiguous target: % profiles match email %', v_count, target_email;
+  END IF;
+
   UPDATE public.profiles
   SET role = 'admin',
       updated_at = NOW()
-  WHERE lower(email) = lower(trim(target_email));
-
-  GET DIAGNOSTICS v_updated = ROW_COUNT;
-  IF v_updated = 0 THEN
-    RAISE EXCEPTION 'No profile found with email: %', target_email;
-  END IF;
+  WHERE lower(email) = v_clean_email;
 END;
 $$;
 
@@ -296,6 +317,8 @@ BEGIN
   END IF;
 END;
 $$;
+
+COMMIT;
 
 -- =============================================================================
 -- End of Migration: 20261025000001_m002_corrective_hardening.sql
