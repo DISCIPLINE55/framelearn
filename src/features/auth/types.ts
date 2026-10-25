@@ -10,6 +10,8 @@ export interface AuthState {
   isAdmin: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isProfileLoading: boolean;
+  profileError: string | null;
   isConfigured: boolean;
   connectionStatus: SupabaseConnectionStatus | null;
   signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;

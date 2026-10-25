@@ -56,6 +56,8 @@ describe('PhotographerPortalPage Component and Business View', () => {
       isAdmin: true,
       isAuthenticated: true,
       isLoading: false,
+      isProfileLoading: false,
+      profileError: null,
       isConfigured: true,
       connectionStatus: null,
       signInWithEmail: vi.fn(),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from '../../components/layout/Container';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -7,6 +7,8 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { useToast } from '../providers/ToastContext';
+import { supabase } from '../../lib/database/supabase';
+import { Service } from '../../types/database';
 import {
   ShieldCheck,
   Database,
@@ -16,6 +18,7 @@ import {
   Activity,
   CheckCircle2,
   AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 
 const CANONICAL_SERVICES = [
@@ -36,6 +39,47 @@ const PhotographerPortalContent: React.FC = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [probeResult, setProbeResult] = useState<string | null>(null);
 
+  // Live database services state — clearly distinguished from canonical hardcoded presentation data
+  const [liveServices, setLiveServices] = useState<Service[] | null>(null);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState<string | null>(null);
+
+  const fetchLiveServices = async () => {
+    if (!isConfigured) {
+      setLiveServices(null);
+      setServicesError('Supabase backend credentials are not configured in .env.');
+      return;
+    }
+
+    setServicesLoading(true);
+    setServicesError(null);
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        setServicesError(error.message);
+        setLiveServices(null);
+      } else {
+        setLiveServices(data || []);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to query live services from PostgreSQL.';
+      setServicesError(msg);
+      setLiveServices(null);
+    } finally {
+      setServicesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isConfigured) {
+      fetchLiveServices();
+    }
+  }, [isConfigured]);
+
   const handleProbe = async () => {
     setIsProbing(true);
     setProbeResult(null);
@@ -46,6 +90,8 @@ const PhotographerPortalContent: React.FC = () => {
         toast.success('Connection to Supabase backend is live and operational.', {
           title: 'Supabase Verified',
         });
+        // Also refresh live services upon successful probe
+        fetchLiveServices();
       } else {
         setProbeResult(result.message);
         if (result.configured) {
@@ -79,7 +125,7 @@ const PhotographerPortalContent: React.FC = () => {
               Photographer Access Verified
             </Badge>
             <Badge variant="cream" size="sm">
-              Role: {role || 'admin'}
+              Role: {role || 'Unassigned'}
             </Badge>
           </div>
           <h1 className="text-h2 font-display font-bold text-white tracking-tight">
@@ -156,7 +202,7 @@ const PhotographerPortalContent: React.FC = () => {
           </Button>
         </Card>
 
-        {/* Database Tables Verification */}
+        {/* Database Tables Specification */}
         <Card variant="default" className="p-6 bg-surface-light border-2 border-sage-200">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-navy/10">
             <div className="flex items-center gap-2.5">
@@ -173,7 +219,7 @@ const PhotographerPortalContent: React.FC = () => {
           </div>
 
           <p className="text-small text-navy-800 mb-3">
-            The database migration (<code className="font-mono text-xs">20261020000001_initial_schema.sql</code>) establishes the core business entities:
+            The database schema architecture (defined in migrations <code className="font-mono text-xs">20261020000001_initial_schema.sql</code> and <code className="font-mono text-xs">20261025000001_m002_corrective_hardening.sql</code>) specifies the core business entities:
           </p>
 
           <ul className="space-y-2 text-xs text-navy-900 mb-4">
@@ -224,26 +270,54 @@ const PhotographerPortalContent: React.FC = () => {
               <Badge variant="sage" size="sm">
                 Milestone 003 Preparation
               </Badge>
-              <Badge variant="outline" size="sm">
-                Schema Registered
-              </Badge>
+              {liveServices ? (
+                <Badge variant="sage" size="sm">
+                  Live Database Read ({liveServices.length} Disciplines)
+                </Badge>
+              ) : (
+                <Badge variant="outline" size="sm">
+                  Canonical Presentation Reference
+                </Badge>
+              )}
             </div>
             <h2 className="text-h2 font-display font-bold text-navy">
               Canonical Photography Services
             </h2>
             <p className="text-small text-navy-800 mt-1">
-              Arafat Nabuku Jansu's 8 registered service disciplines ready for package and pricing configuration in Milestone 003.
+              {liveServices
+                ? 'Retrieved live from PostgreSQL table public.services. Ready for package and pricing configuration in Milestone 003.'
+                : 'Canonical service disciplines ready for package and pricing configuration in Milestone 003.'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-semibold text-navy bg-cream px-3 py-1.5 rounded-frame border border-sage/40">
-            <AlertTriangle className="w-4 h-4 text-navy" />
-            <span>Prices will be configured in Milestone 003 without invented figures.</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              isLoading={servicesLoading}
+              onClick={fetchLiveServices}
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+            >
+              {servicesLoading ? 'Querying...' : 'Query Database Services'}
+            </Button>
+            <div className="flex items-center gap-2 text-xs font-semibold text-navy bg-cream px-3 py-1.5 rounded-frame border border-sage/40">
+              <AlertTriangle className="w-4 h-4 text-navy" />
+              <span>Prices configured in Milestone 003.</span>
+            </div>
           </div>
         </div>
 
+        {servicesError && (
+          <div
+            role="status"
+            className="mb-4 p-3 rounded-frame bg-cream border border-sage/50 text-navy text-xs flex items-center justify-between"
+          >
+            <span>Live database query note: {servicesError} (Displaying canonical reference specification below).</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {CANONICAL_SERVICES.map((srv) => (
+          {(liveServices && liveServices.length > 0 ? liveServices : CANONICAL_SERVICES).map((srv) => (
             <div
               key={srv.id}
               className="p-4 rounded-frame bg-white border border-navy/10 shadow-subtle hover:border-sage transition-colors flex flex-col justify-between"

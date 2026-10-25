@@ -13,13 +13,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<ProfileRole | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isProfileLoading, setIsProfileLoading] = useState<boolean>(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<SupabaseConnectionStatus | null>(null);
 
   const configured = isSupabaseConfigured();
   const { toast } = useToast();
 
-  const fetchProfile = useCallback(async (userId: string, userMetaRole?: string): Promise<Profile | null> => {
-    if (!configured) return null;
+  const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
+    if (!configured) {
+      setProfile(null);
+      setRole(null);
+      setProfileError(null);
+      return null;
+    }
+
+    setIsProfileLoading(true);
+    setProfileError(null);
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -29,23 +40,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.warn('[FrameLearn Auth] Could not fetch profile from database:', error.message);
+        setProfile(null);
+        setRole(null);
+        setProfileError(error.message);
+        return null;
       }
 
       const userProfile = data as Profile | null;
 
       if (userProfile) {
         setProfile(userProfile);
+        // Authoritative role originates strictly from database record
         setRole(userProfile.role);
+        setProfileError(null);
         return userProfile;
       }
 
-      // Fallback role assignment from user metadata if database row is initializing
-      const fallbackRole = (userMetaRole as ProfileRole) || 'admin';
-      setRole(fallbackRole);
+      // Missing profile: NEVER fallback to 'admin' or user_metadata
+      setProfile(null);
+      setRole(null);
+      setProfileError('No profile record found in the database for this user.');
       return null;
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unexpected error fetching profile.';
       console.warn('[FrameLearn Auth] Unexpected error fetching profile:', err);
+      setProfile(null);
+      setRole(null);
+      setProfileError(msg);
       return null;
+    } finally {
+      setIsProfileLoading(false);
     }
   }, [configured]);
 
@@ -66,15 +90,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (isMounted) {
-          if (data.session) {
+          if (data?.session?.user) {
             setSession(data.session);
             setUser(data.session.user);
-            await fetchProfile(data.session.user.id, data.session.user.user_metadata?.role);
+            await fetchProfile(data.session.user.id);
           } else {
             setSession(null);
             setUser(null);
             setProfile(null);
             setRole(null);
+            setProfileError(null);
           }
         }
       } catch (err) {
@@ -97,10 +122,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          await fetchProfile(newSession.user.id, newSession.user.user_metadata?.role);
+          await fetchProfile(newSession.user.id);
         } else {
           setProfile(null);
           setRole(null);
+          setProfileError(null);
         }
 
         setIsLoading(false);
@@ -109,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false;
-      authListener.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, [configured, fetchProfile]);
 
@@ -155,10 +181,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         setUser(data.user);
         setSession(data.session);
-        await fetchProfile(data.user.id, data.user.user_metadata?.role);
-        toast.success(`Authenticated as ${data.user.email}. Welcome back.`, {
-          title: 'Photographer Access Verified',
-        });
+        const userProfile = await fetchProfile(data.user.id);
+
+        if (userProfile && userProfile.role === 'admin') {
+          toast.success(`Authenticated as ${data.user.email}. Welcome back.`, {
+            title: 'Photographer Access Verified',
+          });
+        } else if (userProfile) {
+          toast.warning(
+            `Authenticated as ${data.user.email}, but this account does not possess administrator privileges.`,
+            {
+              title: 'Access Restricted',
+            }
+          );
+        } else {
+          toast.error(
+            `Authenticated as ${data.user.email}, but no verified administrator profile was found in the database.`,
+            {
+              title: 'Profile Verification Failed',
+            }
+          );
+        }
       }
 
       return { success: true };
@@ -176,15 +219,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async (): Promise<void> => {
     if (configured) {
       try {
-        await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.warn('[FrameLearn Auth] Sign out error:', error.message);
+          toast.error(`Sign out failed: ${error.message}`, {
+            title: 'Sign Out Error',
+          });
+          return;
+        }
       } catch (err) {
-        console.warn('[FrameLearn Auth] Sign out error:', err);
+        const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred during sign out.';
+        console.warn('[FrameLearn Auth] Sign out exception:', err);
+        toast.error(errorMsg, {
+          title: 'Sign Out Error',
+        });
+        return;
       }
     }
+
     setUser(null);
     setSession(null);
     setProfile(null);
     setRole(null);
+    setProfileError(null);
     toast.info('Your management session has been terminated securely.', {
       title: 'Photographer Signed Out',
     });
@@ -201,6 +258,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin,
     isAuthenticated,
     isLoading,
+    isProfileLoading,
+    profileError,
     isConfigured: configured,
     connectionStatus,
     signInWithEmail,
@@ -224,6 +283,8 @@ export const useAuth = (): AuthState => {
       isAdmin: false,
       isAuthenticated: false,
       isLoading: false,
+      isProfileLoading: false,
+      profileError: null,
       isConfigured: false,
       connectionStatus: null,
       signInWithEmail: async () => ({ success: false, error: 'Auth context not available' }),

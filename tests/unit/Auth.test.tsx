@@ -6,12 +6,14 @@ import { useAuth } from '../../src/features/auth/context/AuthContext';
 import { PhotographerLoginForm } from '../../src/features/auth/components/PhotographerLoginForm';
 
 const AuthConsumerTest = () => {
-  const { isConfigured, isAuthenticated, isAdmin, user, signOut } = useAuth();
+  const { isConfigured, isAuthenticated, isAdmin, isProfileLoading, profileError, user, signOut } = useAuth();
   return (
     <div>
       <span data-testid="is-configured">{String(isConfigured)}</span>
       <span data-testid="is-authenticated">{String(isAuthenticated)}</span>
       <span data-testid="is-admin">{String(isAdmin)}</span>
+      <span data-testid="is-profile-loading">{String(isProfileLoading)}</span>
+      <span data-testid="profile-error">{profileError || 'none'}</span>
       <span data-testid="user-email">{user?.email || 'none'}</span>
       <button onClick={() => signOut()}>Trigger Sign Out</button>
     </div>
@@ -28,6 +30,8 @@ describe('Auth Context and Photographer Login Primitives', () => {
 
     expect(screen.getByTestId('is-authenticated').textContent).toBe('false');
     expect(screen.getByTestId('is-admin').textContent).toBe('false');
+    expect(screen.getByTestId('is-profile-loading').textContent).toBe('false');
+    expect(screen.getByTestId('profile-error').textContent).toBe('none');
     expect(screen.getByTestId('user-email').textContent).toBe('none');
   });
 
