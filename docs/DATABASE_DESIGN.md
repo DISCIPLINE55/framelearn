@@ -175,7 +175,7 @@ Prior to deployment to production project `htnquutikqahijrtvjsv`, an exhaustive 
 1. **Elimination of Signup Privilege Escalation**:
    - *Previous state*: `handle_new_user()` used `COALESCE(NEW.raw_user_meta_data->>'role', 'admin')`.
    - *Security vulnerability*: Any user signing up could assign themselves the `admin` role by submitting client-side metadata or relying on the unparameterized default.
-   - *Remediation*: Default role is strictly `'client'`. Admin provisioning is restricted exclusively to the first registered user (`SELECT NOT EXISTS (SELECT 1 FROM public.profiles)`) or the designated photographer email (`arafat@framelearn.com`). Client-supplied role metadata is completely ignored.
+   - *Remediation*: Default role is strictly `'client'`. Client-supplied role metadata is completely ignored. (Automatic first-user and hardcoded email promotions were subsequently eliminated in corrective migration `20261025000001_m002_corrective_hardening.sql`).
 2. **Role Escalation Protection Trigger (`protect_profile_role`)**:
    - *Previous state*: User profile update policy allowed users to update their own row without preventing modification of the `role` column.
    - *Security vulnerability*: A malicious user could send `role = 'admin'` in an update query.
@@ -191,3 +191,30 @@ Prior to deployment to production project `htnquutikqahijrtvjsv`, an exhaustive 
    - Enforced `booking_status_history.changed_by` default to `auth.uid()`.
 6. **Explicit Schema Grants**:
    - Revoked public execution grants on internal triggers and helper functions; explicitly granted only required table permissions to `anon` and `authenticated`.
+
+---
+
+## 8. Milestone 002 Corrective Hardening & Performance Optimization
+
+Applied via version-controlled migration `supabase/migrations/20261025000001_m002_corrective_hardening.sql`:
+
+1. **Complete Removal of Automatic Admin Promotion**:
+   - Removed the first-registered-user promotion rule (`is_first_user`).
+   - Removed the hardcoded email promotion rule (`LOWER(NEW.email) = 'arafat@framelearn.com'`).
+   - Public registrations unconditionally receive `'client'`. Administrator provisioning requires an authorized database owner to update the profile explicitly.
+2. **SECURITY DEFINER Function ACL Hardening**:
+   - `public.handle_new_user()`: Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Granted exclusively to `supabase_auth_admin`, `service_role`, and `postgres`.
+   - `public.protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Granted to `authenticated` (for trigger evaluation on profile updates), `service_role`, and `postgres`.
+   - `public.is_admin()`: Execution revoked from `PUBLIC` and `anon`. Granted to `authenticated`, `service_role`, and `postgres`.
+3. **Covering Indexes on Foreign Keys (Performance Advisor Remediation)**:
+   - Added `idx_booking_requests_package_id` on `public.booking_requests(package_id)`.
+   - Added `idx_booking_status_history_changed_by` on `public.booking_status_history(changed_by)`.
+4. **RLS InitPlan Optimization & Policy Consolidation**:
+   - Wrapped `auth.uid()` in `(SELECT auth.uid())` across profile policies to permit PostgreSQL initPlan statement caching.
+   - Consolidated `profiles_update_own` and `profiles_update_admin` into a single policy `profiles_update_own_or_admin` to eliminate multiple permissive update policy warnings.
+   - Partitioned `services` and `service_packages` SELECT policies into separate `anon` and `authenticated` rules so anonymous queries evaluate `is_active = TRUE` directly without invoking `is_admin()`.
+5. **Retention Justification for Unused Indexes**:
+   - Indexes on slugs, active states, and timestamps currently report 0 scans due to minimal pre-production traffic. They are retained because they provide necessary indexed lookups for Milestone 003 filtering and Milestone 004 booking workflows.
+6. **Migration History Reconciliation**:
+   - Reconciles `supabase_migrations.schema_migrations` with versions `20261020000001` and `20261025000001`.
+

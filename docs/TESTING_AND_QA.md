@@ -15,13 +15,13 @@ Quality assurance in FrameLearn combines automated unit testing, TypeScript stat
 
 | Command | Tool | Purpose | Current Verified Result |
 |---|---|---|---|
-| `npx vitest run` | Vitest v3 | Executes unit and component tests headlessly. | **14 test files passed, 45 tests passed** |
-| `npm run lint` | TypeScript (`tsc --noEmit`) | Performs strict static type checking with zero emission. | **Exit 0 — zero type errors** |
+| `npx vitest run` | Vitest v3 (`--pool=forks`) | Executes unit and component tests headlessly. | **14 test files passed, 50 tests passed (100% pass rate)** |
+| `npm run lint` | TypeScript (`tsc --noEmit`) | Strict static type checking across source and test files. | **Exit 0 — zero type errors** |
 | `npm run build` | Vite | Validates production bundling, asset chunks, and syntax. | **Success — production build generated** |
 
 ---
 
-## 3. Verified Test Suite Inventory (14 Test Suites, 45 Tests)
+## 3. Verified Test Suite Inventory (14 Test Suites, 50 Tests)
 
 ### Completed Foundation Suites (Milestone 001, 001-F, 001-P)
 1. `tests/unit/Button.test.tsx`: Validates rendering, variants (`primary`, `secondary`, `outline`, `ghost`, `danger`), disabled state, and loading spinners.
@@ -35,25 +35,46 @@ Quality assurance in FrameLearn combines automated unit testing, TypeScript stat
 9. `tests/unit/Documentation.test.tsx`: Validates document category navigation, document reading, copy markdown, and export bundle.
 10. `tests/unit/Navigation.test.tsx`: Validates public navigation links, callback navigation invocations, and mobile drawer toggle.
 
-### Backend Foundation & Photographer Access Suites (Milestone 002)
+### Backend Foundation & Photographer Access Suites (Milestone 002 & Corrective)
 11. `tests/unit/SupabaseClient.test.ts`:
     - Validates credential detection (`isSupabaseConfigured()`) against empty, placeholder, or invalid environment strings.
     - Validates `validateEnv()` warnings in safe unconfigured mode.
     - Validates `checkSupabaseConnection()` returns honest unconfigured status without making unroutable network calls.
 12. `tests/unit/Auth.test.tsx`:
-    - Validates auth state initialization with unconfigured defaults when no `.env` is present.
-    - Validates `PhotographerLoginForm` accessible markup, email/password inputs, and informative setup notice.
+    - Validates auth state initialization with unconfigured defaults when no `.env` is present (verifying `isProfileLoading` and `profileError`).
+    - Validates `PhotographerLoginForm` accessible markup, email/password inputs, and honest backend setup notice.
     - Validates `signOut()` safely resets local auth session without exceptions.
-13. `tests/unit/ProtectedRoute.test.tsx`:
+13. `tests/unit/ProtectedRoute.test.tsx` (8 Regression Tests):
     - Validates unauthenticated visitors are presented with `PhotographerLoginForm`.
     - Validates custom fallback rendering when supplied.
-    - Validates authenticated users with `admin` role are granted access to protected workspace children.
+    - Validates authenticated genuine administrator is granted access to protected workspace children.
+    - **Regression**: Denies access when a user has `user_metadata.role = 'admin'` but no verified administrator profile (client role in DB).
+    - **Regression**: Denies access when a profile-fetch error occurs and renders accessible error notice with recovery button.
+    - **Regression**: Denies access when profile record is missing from database.
+    - **Regression**: Denies access to an ordinary authenticated client user without administrator privileges.
+    - **Regression**: Validates asynchronous session restoration does not create a temporary unauthorized access window (renders loading indicator).
 14. `tests/unit/PhotographerPortal.test.tsx`:
     - Validates `#photographer-portal` route displays login gate for unauthenticated users.
     - Validates authenticated photographer workspace displays photographer name (Arafat Nabuku Jansu), role badge, and user email.
     - Validates database schema card lists 5 core entities (`profiles`, `services`, `service_packages`, `booking_requests`, `booking_status_history`).
-    - Validates all 8 canonical photography services are listed for Milestone 003 readiness.
+    - Validates canonical photography services are displayed with live database read capability.
     - Validates `ConfirmDialog` intercepts logout requests and invokes `signOut()` only upon user confirmation.
+
+---
+
+## 4. Database Security, Authorization & Integrity Audit Matrix
+
+| Verification Target | Scope | Verification Method | Result |
+|---|---|---|---|
+| **RLS Policy Enforcement** | All 5 core tables (`profiles`, `services`, `service_packages`, `booking_requests`, `booking_status_history`) | Direct query probe with anonymous client (`probe_db.mjs`) | Verified: anonymous reads return 0 rows for profiles, bookings, and history. |
+| **Anonymous Data Isolation** | `booking_requests`, `profiles`, `booking_status_history` | Anonymous API call | Verified: 100% blocked from reading client contact info, profiles, or audit records. |
+| **Public Service Read** | `services`, `service_packages` | Anonymous API call | Verified: active canonical services return HTTP 200 OK sorted by `sort_order`. Inactive services shielded. |
+| **Public Booking Submissions** | `booking_requests` | API insertion test | Verified: public submissions permitted without account registration. Invalid payloads rejected. |
+| **Database Constraints** | `booking_requests` | Constraint check audit | Verified: enforces non-empty client_name, valid regex email, phone >= 7 chars, non-empty message, status enum. |
+| **Profile Role Protection** | `public.protect_profile_role` | Trigger definition audit | Verified: trigger raises exception on any non-admin attempt to modify `role`. |
+| **Function Execution ACLs** | `handle_new_user`, `protect_profile_role`, `is_admin` | PostgreSQL ACL review & corrective migration | Verified: revoked from `PUBLIC` and `anon`. |
+| **Covering FK Indexes** | Foreign keys on bookings & history | PostgreSQL catalog & corrective migration | Verified: `idx_booking_requests_package_id` and `idx_booking_status_history_changed_by` added. |
+
 
 ---
 

@@ -200,6 +200,61 @@ This log records verified changes and implementation history. Every entry identi
   - TypeScript compilation: zero errors.
   - Production build: clean compilation.
 - **Milestone 002 Gate Status**:
-  - **Milestone 002 is fully implemented and live on production backend.**
-  - Ready for academic gate review by the Project Lecturer prior to commencing Milestone 003.
+  - Ready for academic gate review by the Project Lecturer prior to commencing Milestone 003. Note: Milestone 002 is not formally accepted until the lecturer confirms acceptance.
+204: 
+205: ---
+206: 
+207: ## Log Entry 009 — Milestone 002 Corrective Authorization, Privilege Hardening & Performance Stabilization
+208: - **Feature Name**: Milestone 002 Corrective Implementation
+209: - **Progression State**:
+210:   - **Implemented locally**: Yes
+211:   - **Tested locally**: Yes (14 test files, 50 unit and regression tests passing)
+212:   - **Applied to Supabase**: Initial schema (`20261020000001_initial_schema.sql`) live; corrective hardening migration (`20261025000001_m002_corrective_hardening.sql`) version-controlled and prepared for execution via Supabase SQL Editor.
+213:   - **Verified against live database**: Yes (Probed active project `htnquutikqahijrtvjsv`; verified 8 canonical services, anonymous isolation on profiles/bookings/history, and RLS integrity).
+214:   - **Committed**: Local git commits prepared.
+215:   - **Pushed**: Pending user review (git restriction strictly observed).
+216:   - **Deployed**: Not deployed to Vercel (per production restrictions).
+217:   - **Presented to lecturer**: Pending.
+218:   - **Accepted by lecturer**: PENDING (Milestone 002 is NOT lecturer-accepted until formal confirmation).
+219: - **Purpose**: Inspect, secure, and stabilize the existing FrameLearn backend and photographer-access implementation without starting Milestone 003 or altering core architecture.
+220: - **Requirements Addressed**: Milestone 002 Corrective Requirements 1–13.
+221: - **Files Modified / Created**:
+222:   - `src/features/auth/types.ts`: Added `isProfileLoading: boolean` and `profileError: string | null` to `AuthState`.
+223:   - `src/features/auth/context/AuthContext.tsx`:
+224:     - Eliminated `fallbackRole = (userMetaRole as ProfileRole) || 'admin';`.
+225:     - Removed `userMetaRole` argument from `fetchProfile()`.
+226:     - Authoritative role originates exclusively from verified database profile row (`userProfile.role`).
+227:     - Profile fetch failures and missing profiles set `role = null`, `profile = null`, and populate `profileError`.
+228:     - `signInWithEmail()` verifies admin role before displaying success toast; non-admin accounts receive clear access restricted notices.
+229:     - `signOut()` checks `supabase.auth.signOut()` success before confirming termination.
+230:   - `src/features/auth/components/ProtectedRoute.tsx`:
+231:     - Guards against temporary access windows during asynchronous session restoration and profile loading (`isLoading || isProfileLoading`).
+232:     - Authenticated non-admin accounts receive an accessible "Unauthorized Account / Access Restricted" interface with retry and account-switch options, eliminating redirect loops.
+233:   - `src/app/routes/PhotographerPortalPage.tsx`:
+234:     - Displays `Role: {role || 'Unassigned'}` (never falls back to `'admin'`).
+235:     - Implemented live database queries to `public.services`, clearly distinguishing live connection from verified database reads.
+236:     - Preserved canonical services list as an explicitly labeled presentation specification fallback.
+237:     - Clarified that database schema presentation represents architecture specification.
+238:   - `supabase/migrations/20261025000001_m002_corrective_hardening.sql`:
+239:     - Hardened `public.handle_new_user()` to unconditionally assign `'client'`.
+240:     - Eliminated first-user automatic promotion and hardcoded email promotions (`arafat@framelearn.com`).
+241:     - Revoked function execution from `PUBLIC` and `anon` on `handle_new_user()`, `protect_profile_role()`, and `is_admin()`.
+242:     - Added covering foreign key indexes: `idx_booking_requests_package_id` and `idx_booking_status_history_changed_by`.
+243:     - Combined permissive update policies on `profiles` to eliminate Performance Advisor warnings.
+244:     - Optimized RLS policies with `(SELECT auth.uid())` for statement initPlan caching.
+245:     - Partitioned `services` and `service_packages` SELECT policies for clean anonymous isolation.
+246:     - Added idempotent migration history tracking into `supabase_migrations.schema_migrations`.
+247:   - `supabase/migrations/README.md`: Documented migration inventory, history reconciliation cause, and manual admin provisioning procedure.
+248:   - `vite.config.ts`: Configured Vitest `pool: 'forks'` to ensure fast, reliable test runs on Windows OneDrive.
+249:   - `tests/unit/ProtectedRoute.test.tsx`: Added 8 comprehensive regression tests demonstrating access denial for unverified metadata, missing profiles, profile errors, client accounts, and async hydration.
+250:   - `tests/unit/Auth.test.tsx` & `tests/unit/PhotographerPortal.test.tsx`: Updated test mocks and added assertions for profile state.
+251:   - Authoritative documentation updated in `docs/`.
+252: - **Actual Verification Results**:
+253:   - Vitest: 14 test files passed, 50 unit and regression tests passed.
+254:   - TypeScript: `tsc --noEmit` exited 0 with zero errors.
+255:   - Production build: `vite build` completed successfully.
+256: - **Outstanding Manual Steps**:
+257:   1. Execute `supabase/migrations/20261025000001_m002_corrective_hardening.sql` in the Supabase Dashboard SQL Editor for project `htnquutikqahijrtvjsv`.
+258:   2. Create Arafat Nabuku Jansu's photographer account in Supabase Auth and execute the authorized manual role promotion statement in PostgreSQL.
+259:   3. Present stabilized Milestone 002 implementation to the Project Lecturer for formal acceptance.
 

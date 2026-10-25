@@ -24,16 +24,23 @@ Security policies are partitioned strictly by authorization tier:
    - `SELECT / INSERT`: Strictly restricted to authenticated administrators (`is_admin()`).
 
 ### 2.2 Role-Based Access Control (RBAC) & Privilege Protection
-- **Security Definer Isolation**: All administrative helper and trigger functions (`is_admin`, `handle_new_user`, `protect_profile_role`) strictly declare `SET search_path = public, pg_temp;` to mitigate search-path injection vectors.
-- **Trigger-Enforced Role Immutability**: The `protect_profile_role` trigger intercepts all `UPDATE` queries on `public.profiles`. Any attempt by an authenticated non-admin to alter the `role` column raises an unhandled exception.
-- **Controlled Admin Bootstrapping**: `handle_new_user()` defaults new signups to `'client'`. Admin elevation is restricted to the first profile created in an empty database or the designated photographer address (`arafat@framelearn.com`). Client-supplied signup metadata is discarded.
-- **Client & Learner Data Isolation**: Non-admin users are strictly bounded to their own profile row (`id = auth.uid()`). Public inquiries in `booking_requests` are completely shielded from public read access.
+- **Authoritative Database Verification**: The administrative `'admin'` role must originate strictly from a trusted, successfully retrieved database profile row. User-editable metadata (`user_metadata.role`), missing profiles, or profile-fetch errors NEVER authorize administrative access and default safely to non-admin status (`isAdmin = false`).
+- **Zero Automatic Admin Elevation**: In PostgreSQL `handle_new_user()`, all public signups unconditionally receive the least-privileged `'client'` role. Automatic promotion of the first registered user and hardcoded email-based promotion rules are completely eliminated. Client-supplied signup metadata is ignored.
+- **Controlled Administrative Provisioning**: The photographer's administrator account must be provisioned through an authorized process (account creation followed by explicit administrative role assignment by the database owner). No default administrators with hardcoded credentials exist.
+- **Trigger-Enforced Role Immutability**: The `protect_profile_role()` trigger intercepts all `UPDATE` queries on `public.profiles`. Any attempt by an authenticated non-admin or profile owner to alter the `role` column raises a security exception.
+- **Function Execution Privilege Hardening**:
+  - `handle_new_user()`: Execution revoked from `PUBLIC`, `anon`, and `authenticated`. Callable solely by `supabase_auth_admin`, `service_role`, and `postgres`.
+  - `protect_profile_role()`: Execution revoked from `PUBLIC` and `anon`. Callable by `authenticated` (for profile updates evaluated by the trigger), `service_role`, and `postgres`.
+  - `is_admin()`: Execution revoked from `PUBLIC` and `anon`. Accessible to `authenticated` for RLS evaluations.
+  - All security-definer functions declare `SET search_path = public, pg_temp;` to mitigate search-path hijacking.
+- **Client & Learner Data Isolation**: Non-admin users are strictly bounded to their own profile row (`id = (SELECT auth.uid())`). Public inquiries in `booking_requests` and audit entries in `booking_status_history` are completely shielded from public read access.
 
 ### 2.3 Route Guard & Protected Gateways
 - Route `#photographer-portal` (and aliases `#admin`, `#login`) is protected by `<ProtectedRoute>`.
+- Asynchronous session restoration and profile loading display a non-blocking loading state, preventing any unauthorized exposure window.
 - Unauthenticated visitors are presented with the accessible `PhotographerLoginForm`.
-- Non-admin sessions are denied administrative control access.
-- End-of-session logout requires explicit confirmation via `ConfirmDialog`.
+- Authenticated non-admin sessions (e.g. clients, missing profiles, profile-fetch errors) receive an explicit, accessible "Access Restricted / Unauthorized Account" screen with recovery options ("Retry Authorization" and "Sign Out & Switch Account"), avoiding redirect loops or stuck states.
+- End-of-session logout requires explicit confirmation via `ConfirmDialog` and verifies successful termination before confirming sign-out.
 
 ---
 

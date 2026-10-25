@@ -122,3 +122,26 @@ This log documents Architectural Decision Records (ADRs) and key technical choic
   - Defense-in-depth security enforced at the PostgreSQL database engine level.
   - Zero possibility of client-side role elevation through signup payloads or profile update calls.
   - Immune to schema search-path injection attacks.
+
+---
+
+## ADR-011: Milestone 002 Corrective Authorization, Privilege Hardening & Database Performance Stabilization
+- **Date**: October 2026
+- **Status**: Accepted
+- **Context**: Comprehensive security inspection of Milestone 002 revealed:
+  1. *Frontend privilege escalation fallback*: `AuthContext.tsx` contained `const fallbackRole = (userMetaRole as ProfileRole) || 'admin';`, granting administrative privileges if a database profile was missing, delayed, or if a user set metadata `role: 'admin'`.
+  2. *Automatic admin provisioning in PostgreSQL*: `handle_new_user()` promoted the first registered user to admin and hardcoded `arafat@framelearn.com`.
+  3. *SECURITY DEFINER function exposure*: Functions `handle_new_user()`, `protect_profile_role()`, and `is_admin()` retained execution privileges for `PUBLIC` and `anon`.
+  4. *Performance Advisor findings*: Unindexed foreign keys on `booking_requests(package_id)` and `booking_status_history(changed_by)`, multiple permissive update policies on `profiles`, and unoptimized `auth.uid()` calls without initPlan caching.
+  5. *Migration history reconciliation*: Table `supabase_migrations.schema_migrations` had no recorded migrations because the initial migration was applied via the Supabase Dashboard SQL Editor under an organization boundary that prevented CLI linking.
+- **Decision**:
+  1. *Frontend authorization hardening*: Remove all fallbacks. Role is sourced strictly from a verified database profile row. Missing profiles or fetch errors set `role = null` and populate `profileError`. Authenticated non-admins receive an accessible "Unauthorized Account" view with retry and sign-out options, eliminating redirect loops.
+  2. *Eliminate automatic promotion*: Update `handle_new_user()` so public signups unconditionally receive `'client'`. Admin accounts must be promoted via authorized database owner action.
+  3. *Function ACL hardening*: Revoke execute on `handle_new_user()` from `PUBLIC`, `anon`, and `authenticated`; revoke execute on `protect_profile_role()` and `is_admin()` from `PUBLIC` and `anon`. Partition `services` and `service_packages` SELECT policies so `anon` does not evaluate `is_admin()`.
+  4. *Performance remediation*: Add covering indexes `idx_booking_requests_package_id` and `idx_booking_status_history_changed_by`. Combine permissive update policies on `profiles` and wrap `(SELECT auth.uid())`.
+  5. *Safe migration reconciliation*: Provide version-controlled additive migration `20261025000001_m002_corrective_hardening.sql` that idempotently registers migration versions into `supabase_migrations.schema_migrations`.
+- **Consequences**:
+  - Eliminates frontend and database privilege escalation vectors completely.
+  - Resolves Supabase Security Advisor and Performance Advisor findings.
+  - Maintains zero-disruption compatibility with existing database records and application architecture.
+
