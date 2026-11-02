@@ -1,2 +1,6 @@
-/** Dashboard Feature Boundary (Planned for Milestone 007) */
-export const DASHBOARD_FEATURE_CONFIG = { name: 'dashboard', status: 'planned_milestone_007' } as const;
+export * from './components/DashboardSidebar';
+export * from './components/DashboardOverview';
+export * from './components/BookingsManagement';
+export * from './components/ServicesManagement';
+export * from './components/BookingDetailsModal';
+export * from './components/ServiceFormModal';

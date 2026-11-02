@@ -156,10 +156,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string
   ): Promise<{ success: boolean; error?: string }> => {
     if (!configured) {
-      const errorMsg =
-        'Supabase backend credentials are not configured in environment variables. Please supply VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.';
+      const errorMsg = 'The studio authentication service is currently unavailable. Please try again later.';
       toast.error(errorMsg, {
-        title: 'Backend Configuration Missing',
+        title: 'Service Unavailable',
       });
       return { success: false, error: errorMsg };
     }
@@ -174,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         let displayError = error.message;
         if (error.message.toLowerCase().includes('invalid login credentials')) {
-          displayError = 'Invalid login credentials. If your photographer account has not yet been provisioned in Supabase Auth, account provisioning is required.';
+          displayError = 'Invalid email address or password. Please check your credentials and try again.';
         }
         toast.error(displayError, {
           title: 'Sign In Failed',
@@ -188,21 +187,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userProfile = await fetchProfile(data.user.id);
 
         if (userProfile && userProfile.role === 'admin') {
-          toast.success(`Authenticated as ${data.user.email}. Welcome back.`, {
-            title: 'Photographer Access Verified',
+          toast.success(`Welcome back, ${userProfile.full_name || 'Arafat'}.`, {
+            title: 'Sign In Successful',
           });
         } else if (userProfile) {
           toast.warning(
-            `Authenticated as ${data.user.email}, but this account does not possess administrator privileges.`,
+            'This account does not have administrator privileges to access the photographer portal.',
             {
               title: 'Access Restricted',
             }
           );
         } else {
           toast.error(
-            `Authenticated as ${data.user.email}, but no verified administrator profile was found in the database.`,
+            'Unable to verify administrator profile. Please contact support.',
             {
-              title: 'Profile Verification Failed',
+              title: 'Verification Failed',
             }
           );
         }
@@ -224,10 +223,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string
   ): Promise<{ success: boolean; error?: string }> => {
     if (!configured) {
-      const errorMsg =
-        'Supabase backend credentials are not configured in environment variables.';
+      const errorMsg = 'The studio authentication service is currently unavailable. Please try again later.';
       toast.error(errorMsg, {
-        title: 'Backend Configuration Missing',
+        title: 'Service Unavailable',
       });
       return { success: false, error: errorMsg };
     }

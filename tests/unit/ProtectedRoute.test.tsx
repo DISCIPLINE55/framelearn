@@ -15,7 +15,7 @@ describe('ProtectedRoute Guard Component', () => {
     );
 
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /welcome back|photographer portal/i })).toBeInTheDocument();
   });
 
   it('renders custom fallback when provided and user is not authenticated', async () => {

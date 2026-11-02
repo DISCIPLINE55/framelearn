@@ -42,10 +42,10 @@ describe('Auth Context and Photographer Login Primitives', () => {
       </AppProvider>
     );
 
-    expect(screen.getByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /configuration required in \.env|sign in as photographer/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('safely handles sign-out without crashing and resets local auth state', async () => {
@@ -80,13 +80,13 @@ describe('Auth Context and Photographer Login Primitives', () => {
     // Recovery mode: heading is Reset Password and password input is omitted
     expect(screen.getByRole('heading', { name: /reset password/i })).toBeInTheDocument();
     expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send recovery email|configuration required in \.env/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send recovery link/i })).toBeInTheDocument();
 
     // Click Back to Sign In
     const backBtn = screen.getByRole('button', { name: /back to sign in/i });
     await user.click(backBtn);
 
-    expect(screen.getByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
   });
 });
