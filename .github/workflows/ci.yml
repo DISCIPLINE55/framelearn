@@ -27,7 +27,13 @@ jobs:
         run: npm run lint
 
       - name: Run Unit Tests
+        env:
+          VITE_SUPABASE_URL: https://htnquutikqahijrtvjsv.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_XqrY_YA3porTUNPsryi2tA_rfwAgxra
         run: npm run test
 
       - name: Build Application Bundle
+        env:
+          VITE_SUPABASE_URL: https://htnquutikqahijrtvjsv.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_XqrY_YA3porTUNPsryi2tA_rfwAgxra
         run: npm run build

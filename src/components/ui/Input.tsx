@@ -7,6 +7,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   errorText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  rightElement?: React.ReactNode;
   fullWidth?: boolean;
 }
 
@@ -19,6 +20,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       errorText,
       leftIcon,
       rightIcon,
+      rightElement,
       fullWidth = true,
       id,
       disabled,
@@ -59,7 +61,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage',
               'disabled:cursor-not-allowed disabled:bg-cream-100 disabled:opacity-60',
               leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
+              (rightIcon || rightElement) && 'pr-10',
               hasError
                 ? 'border-red-700 focus:ring-red-600 focus:border-red-700'
                 : 'border-sage-400 hover:border-navy-800',
@@ -71,6 +73,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {rightIcon && (
             <div className="absolute right-3.5 text-navy-800 pointer-events-none flex items-center">
               {rightIcon}
+            </div>
+          )}
+
+          {rightElement && (
+            <div className="absolute right-3.5 text-navy-800 flex items-center z-10">
+              {rightElement}
             </div>
           )}
         </div>
