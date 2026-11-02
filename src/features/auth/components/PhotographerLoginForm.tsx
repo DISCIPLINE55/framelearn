@@ -2,23 +2,43 @@ import React, { useState } from 'react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
-import { Badge } from '../../../components/ui/Badge';
 import {
-  Lock,
+  Camera,
   Mail,
-  ShieldAlert,
-  KeyRound,
-  AlertCircle,
+  Lock,
   ArrowLeft,
-  Send,
   Eye,
   EyeOff,
+  AlertCircle,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../../../app/providers/ToastContext';
 
 export interface PhotographerLoginFormProps {
   onSuccess?: () => void;
   className?: string;
+}
+
+/**
+ * Translates raw authentication errors into clear, friendly messages
+ * without exposing technical implementation details or credentials.
+ */
+function getFriendlyAuthErrorMessage(rawError: string): string {
+  const lower = rawError.toLowerCase();
+  if (lower.includes('invalid') || lower.includes('credentials') || lower.includes('grant')) {
+    return 'Invalid email address or password. Please check your credentials and try again.';
+  }
+  if (lower.includes('network') || lower.includes('fetch') || lower.includes('connection')) {
+    return 'Unable to reach the studio service. Please check your internet connection.';
+  }
+  if (lower.includes('rate limit') || lower.includes('too many')) {
+    return 'Too many sign-in attempts. Please wait a few moments and try again.';
+  }
+  if (lower.includes('not configured')) {
+    return 'The studio authentication service is currently unavailable. Please try again later.';
+  }
+  return 'An error occurred while signing in. Please check your information and try again.';
 }
 
 export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
@@ -26,6 +46,8 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
   className = '',
 }) => {
   const { signInWithEmail, resetPasswordForEmail, isConfigured } = useAuth();
+  const { toast } = useToast();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -39,31 +61,38 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
     setErrorMessage(null);
     setSuccessNotice(null);
 
+    // Guard if backend is entirely unconfigured
     if (!isConfigured) {
-      setErrorMessage(
-        'Supabase backend credentials are not set in .env. Live authentication cannot proceed.'
-      );
+      const msg = 'Studio authentication service is currently unavailable. Please try again later.';
+      setErrorMessage(msg);
+      toast.error(msg, { title: 'Service Unavailable' });
       return;
     }
 
     if (isRecoveryMode) {
       if (!email.trim()) {
-        setErrorMessage('Please enter your photographer email address.');
+        setErrorMessage('Please enter your email address.');
         return;
       }
+
       setIsSubmitting(true);
       const res = await resetPasswordForEmail(email);
       setIsSubmitting(false);
+
       if (res.success) {
-        setSuccessNotice('Recovery email sent. Check your inbox for password reset instructions.');
+        const msg = 'Password recovery link has been sent. Please check your inbox.';
+        setSuccessNotice(msg);
+        toast.success(msg, { title: 'Recovery Link Sent' });
       } else if (res.error) {
-        setErrorMessage(res.error);
+        const friendly = getFriendlyAuthErrorMessage(res.error);
+        setErrorMessage(friendly);
+        toast.error(friendly, { title: 'Recovery Request Failed' });
       }
       return;
     }
 
     if (!email.trim() || !password) {
-      setErrorMessage('Please enter both email and password.');
+      setErrorMessage('Please enter both your email address and password.');
       return;
     }
 
@@ -72,113 +101,111 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
     setIsSubmitting(false);
 
     if (result.success) {
+      toast.success('Signed in successfully. Welcome to your studio dashboard.', {
+        title: 'Welcome Back',
+      });
       onSuccess?.();
     } else if (result.error) {
-      setErrorMessage(result.error);
+      const friendly = getFriendlyAuthErrorMessage(result.error);
+      setErrorMessage(friendly);
+      // AuthContext also emits a toast on error, so form stays in sync
     }
   };
 
   return (
-    <Card variant="default" className={`max-w-md mx-auto p-6 sm:p-8 bg-surface-light border-2 border-navy-800 ${className}`}>
+    <Card
+      variant="default"
+      className={`max-w-md w-full mx-auto p-6 sm:p-8 bg-surface-light border-2 border-navy-800 shadow-elevated ${className}`}
+    >
+      {/* Brand Header */}
       <div className="flex flex-col items-center text-center mb-6">
         <div className="w-12 h-12 rounded-full bg-navy text-sage flex items-center justify-center mb-3 shadow-subtle">
-          <Lock className="w-6 h-6 stroke-[2.2]" />
+          <Camera className="w-6 h-6 stroke-[2.2]" />
         </div>
-        <Badge variant="sage" size="sm" className="mb-2">
-          Photographer Access
-        </Badge>
-        <h2 className="text-h3 font-display font-bold text-navy">
-          {isRecoveryMode ? 'Reset Password' : 'Photographer Portal'}
-        </h2>
-        <p className="text-small text-navy-800 mt-1 max-w-sm">
+        <span className="text-caption font-bold tracking-widest uppercase text-navy-800 mb-1">
+          FrameLearn Studio
+        </span>
+        <h1 className="text-h2 font-display font-bold text-navy">
+          {isRecoveryMode ? 'Reset Password' : 'Welcome Back'}
+        </h1>
+        <p className="text-small text-navy-800 mt-1 max-w-sm leading-relaxed">
           {isRecoveryMode
-            ? 'Request a secure recovery link for your photographer account.'
-            : 'Restricted management gateway for independent photographer Arafat Nabuku Jansu.'}
+            ? 'Enter your photographer email address to receive a secure recovery link.'
+            : 'Sign in to manage your photography studio.'}
         </p>
-        {isConfigured && (
-          <div className="inline-flex items-center gap-1.5 text-[11px] text-navy-900 font-medium mt-2 bg-sage/20 border border-sage/40 px-3 py-1 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-            <span>Live Supabase Auth • Project htnquutikqahijrtvjsv</span>
-          </div>
-        )}
       </div>
 
-      {!isConfigured && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="mb-6 p-4 rounded-frame bg-cream border border-sage/60 text-navy text-small"
-        >
-          <div className="flex items-start gap-2.5">
-            <ShieldAlert className="w-5 h-5 text-navy flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold block">Live Supabase Backend Required</span>
-              <p className="text-xs text-navy-900 leading-relaxed">
-                FrameLearn does not simulate fake authentication. Configure real credentials in your local{' '}
-                <code className="font-mono bg-white px-1 py-0.5 rounded border border-navy/20">.env</code>:
-              </p>
-              <pre className="text-[11px] font-mono bg-navy text-white p-2 rounded mt-1 overflow-x-auto">
-                VITE_SUPABASE_URL=https://&lt;id&gt;.supabase.co{'\n'}
-                VITE_SUPABASE_ANON_KEY=&lt;anon_key&gt;
-              </pre>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Friendly Error Notice */}
       {errorMessage && (
         <div
           role="alert"
           aria-live="assertive"
-          className="mb-4 p-3 rounded-frame bg-red-50 border border-red-300 text-red-900 text-small flex items-start gap-2"
+          className="mb-5 p-3 rounded-frame bg-red-50 border border-red-300 text-red-900 text-small flex items-start gap-2.5"
         >
           <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-          <span className="text-xs">{errorMessage}</span>
+          <span className="text-xs font-medium leading-relaxed">{errorMessage}</span>
         </div>
       )}
 
+      {/* Friendly Success Notice */}
       {successNotice && (
         <div
           role="status"
           aria-live="polite"
-          className="mb-4 p-3 rounded-frame bg-sage-50 border border-sage-300 text-navy text-small flex items-start gap-2"
+          className="mb-5 p-3 rounded-frame bg-sage-50 border border-sage-300 text-navy text-small flex items-start gap-2.5"
         >
-          <Mail className="w-4 h-4 text-navy flex-shrink-0 mt-0.5" />
-          <span className="text-xs">{successNotice}</span>
+          <CheckCircle2 className="w-4 h-4 text-sage flex-shrink-0 mt-0.5" />
+          <span className="text-xs font-medium leading-relaxed">{successNotice}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div>
-          <label
-            htmlFor="photographer-email"
-            className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5"
-          >
-            Email Address
-          </label>
-          <Input
-            id="photographer-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="framelearn28@gmail.com"
-            autoComplete="email"
-            leftIcon={<Mail className="w-4 h-4 text-navy/70" />}
-            disabled={isSubmitting || !isConfigured}
-            fullWidth
-            required
-          />
-        </div>
+      {/* Login / Recovery Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Email Address"
+          type="email"
+          name="email"
+          id="photographer-email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="arafat@example.com"
+          leftIcon={<Mail className="w-4 h-4" />}
+          disabled={isSubmitting}
+        />
 
         {!isRecoveryMode && (
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label
-                htmlFor="photographer-password"
-                className="block text-xs font-bold uppercase tracking-wider text-navy"
+          <div className="space-y-1">
+            <div className="relative">
+              <Input
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                id="photographer-password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                leftIcon={<Lock className="w-4 h-4" />}
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-9 text-navy hover:text-navy-950 p-1 focus:outline-none focus:ring-2 focus:ring-sage rounded"
+                aria-label="Toggle visibility"
+                tabIndex={0}
               >
-                Password
-              </label>
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4 stroke-[2.2]" />
+                ) : (
+                  <Eye className="w-4 h-4 stroke-[2.2]" />
+                )}
+              </button>
+            </div>
+            <div className="flex justify-end pt-1">
               <button
                 type="button"
                 onClick={() => {
@@ -186,34 +213,11 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
                   setErrorMessage(null);
                   setSuccessNotice(null);
                 }}
-                className="text-xs font-medium text-navy hover:text-sage transition-colors underline"
+                className="text-xs font-semibold text-navy hover:text-sage transition-colors underline-offset-2 hover:underline"
               >
-                Forgot Password?
+                Forgot password?
               </button>
             </div>
-            <Input
-              id="photographer-password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
-              autoComplete="current-password"
-              leftIcon={<KeyRound className="w-4 h-4 text-navy/70" />}
-              rightElement={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="p-1 text-navy-700 hover:text-navy focus:outline-none transition-colors"
-                  aria-label="Toggle visibility"
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              }
-              disabled={isSubmitting || !isConfigured}
-              fullWidth
-              required
-            />
           </div>
         )}
 
@@ -224,19 +228,13 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
             size="md"
             fullWidth
             isLoading={isSubmitting}
-            disabled={!isConfigured || isSubmitting}
-            leftIcon={isRecoveryMode ? <Send className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           >
-            {isConfigured
-              ? isRecoveryMode
-                ? 'Send Recovery Email'
-                : 'Sign In as Photographer'
-              : 'Configuration Required in .env'}
+            {isRecoveryMode ? 'Send Recovery Link' : 'Sign In'}
           </Button>
         </div>
 
         {isRecoveryMode && (
-          <div className="text-center pt-2">
+          <div className="pt-2 text-center">
             <button
               type="button"
               onClick={() => {
@@ -244,7 +242,7 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
                 setErrorMessage(null);
                 setSuccessNotice(null);
               }}
-              className="inline-flex items-center gap-1.5 text-xs text-navy hover:text-sage font-semibold"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy hover:text-sage transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Sign In</span>
@@ -252,12 +250,6 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
           </div>
         )}
       </form>
-
-      <div className="mt-6 pt-4 border-t border-navy-100 text-center">
-        <p className="text-[11px] text-navy-800">
-          Public visitors can submit booking inquiries directly on the services and contact pages without logging in.
-        </p>
-      </div>
     </Card>
   );
 };
