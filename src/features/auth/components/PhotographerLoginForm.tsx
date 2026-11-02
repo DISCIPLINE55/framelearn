@@ -3,7 +3,17 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Badge } from '../../../components/ui/Badge';
-import { Lock, Mail, ShieldAlert, KeyRound, AlertCircle, ArrowLeft, Send } from 'lucide-react';
+import {
+  Lock,
+  Mail,
+  ShieldAlert,
+  KeyRound,
+  AlertCircle,
+  ArrowLeft,
+  Send,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export interface PhotographerLoginFormProps {
@@ -18,6 +28,7 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
   const { signInWithEmail, resetPasswordForEmail, isConfigured } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
@@ -84,6 +95,12 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
             ? 'Request a secure recovery link for your photographer account.'
             : 'Restricted management gateway for independent photographer Arafat Nabuku Jansu.'}
         </p>
+        {isConfigured && (
+          <div className="inline-flex items-center gap-1.5 text-[11px] text-navy-900 font-medium mt-2 bg-sage/20 border border-sage/40 px-3 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+            <span>Live Supabase Auth • Project htnquutikqahijrtvjsv</span>
+          </div>
+        )}
       </div>
 
       {!isConfigured && (
@@ -176,12 +193,23 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
             </div>
             <Input
               id="photographer-password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
               autoComplete="current-password"
               leftIcon={<KeyRound className="w-4 h-4 text-navy/70" />}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 text-navy-700 hover:text-navy focus:outline-none transition-colors"
+                  aria-label="Toggle visibility"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              }
               disabled={isSubmitting || !isConfigured}
               fullWidth
               required
