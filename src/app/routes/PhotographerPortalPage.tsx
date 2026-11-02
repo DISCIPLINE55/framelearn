@@ -17,6 +17,7 @@ import {
   updateBookingStatus,
   BookingRequestWithService,
 } from '../../features/bookings';
+import { ProfileManagementCard } from '../../features/profile';
 import { Service, BookingStatus } from '../../types/database';
 import {
   ShieldCheck,
@@ -302,6 +303,9 @@ const PhotographerPortalContent: React.FC = () => {
           <span className="text-[11px] text-navy/70 mt-1">Confirmed bookings</span>
         </div>
       </div>
+
+      {/* Photographer Profile Management Section */}
+      <ProfileManagementCard />
 
       {/* Backend & Database Foundation Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -85,13 +85,13 @@ export const ServicesPreviewPage: React.FC = () => {
       <SectionHeading
         eyebrow="Photography Offerings"
         title="Services Catalog"
-        subtitle="Genuine photography service disciplines retrieved live from the FrameLearn PostgreSQL backend."
+        subtitle="Explore our professional photography disciplines and tailored session packages designed for your special occasions."
       />
 
       {isLoading && (
         <LoadingState
           title="Loading Photography Services"
-          message="Retrieving active photography disciplines from PostgreSQL..."
+          message="Loading photography disciplines and session packages..."
         />
       )}
 
@@ -99,15 +99,15 @@ export const ServicesPreviewPage: React.FC = () => {
         <ErrorState
           title="Could Not Load Services"
           message={error}
-          actionLabel="Retry Database Query"
+          actionLabel="Try Again"
           onAction={loadServicesData}
         />
       )}
 
       {!isLoading && !error && services.length === 0 && (
         <EmptyState
-          title="No Active Services Found"
-          message="There are currently no active photography services configured in the database."
+          title="No Services Available Currently"
+          message="There are currently no active photography packages listed. Please check back soon or reach out directly through our contact page."
           actionLabel="Refresh Catalog"
           onAction={loadServicesData}
         />
