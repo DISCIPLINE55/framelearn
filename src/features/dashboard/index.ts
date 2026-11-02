@@ -1,4 +1,5 @@
 export * from './components/DashboardSidebar';
+export * from './components/DashboardTopBar';
 export * from './components/DashboardOverview';
 export * from './components/BookingsManagement';
 export * from './components/ServicesManagement';

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container } from '../../components/layout/Container';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { ProtectedRoute } from '../../features/auth/components/ProtectedRoute';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { useToast } from '../providers/ToastContext';
-import { fetchAllServices } from '../../features/services';
+import {
+  fetchAllServices,
+  createService,
+  CreateServiceInput,
+} from '../../features/services';
 import {
   fetchBookingRequests,
   updateBookingStatus,
@@ -14,12 +17,13 @@ import { ProfileManagementCard } from '../../features/profile';
 import { Service, BookingStatus } from '../../types/database';
 import {
   DashboardSidebar,
+  DashboardTopBar,
   DashboardOverview,
   BookingsManagement,
   ServicesManagement,
+  ServiceFormModal,
   DashboardTab,
 } from '../../features/dashboard';
-import { Menu, Camera, LogOut } from 'lucide-react';
 
 const PhotographerPortalContent: React.FC = () => {
   const { user, profile, signOut, isConfigured } = useAuth();
@@ -28,6 +32,8 @@ const PhotographerPortalContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isNewServiceModalOpen, setIsNewServiceModalOpen] = useState(false);
+  const [isCreatingService, setIsCreatingService] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
 
   // Live services state
@@ -110,11 +116,31 @@ const PhotographerPortalContent: React.FC = () => {
     }
   };
 
+  // Handle Direct Service Creation from Quick Action
+  const handleCreateNewService = async (payload: any): Promise<boolean> => {
+    setIsCreatingService(true);
+    try {
+      const res = await createService(payload as CreateServiceInput);
+      if (res.error) {
+        toast.error(res.error, { title: 'Service Creation Failed' });
+        return false;
+      }
+      toast.success(`"${payload.name}" was successfully added to studio offerings.`, {
+        title: 'Service Created',
+      });
+      loadServices();
+      setIsNewServiceModalOpen(false);
+      return true;
+    } finally {
+      setIsCreatingService(false);
+    }
+  };
+
   // Handle Session Termination
   const handleConfirmLogout = async () => {
     setIsLogoutDialogOpen(false);
     await signOut();
-    toast.info('You have been logged out of the photographer portal.', {
+    toast.info('You have signed out of the photographer portal.', {
       title: 'Session Ended',
     });
     window.location.hash = '#home';
@@ -122,41 +148,14 @@ const PhotographerPortalContent: React.FC = () => {
 
   const photographerName = profile?.full_name || 'Arafat Nabuku Jansu';
   const photographerEmail = profile?.email || user?.email || 'framelearn28@gmail.com';
+  const photographerPhone = profile?.phone || null;
   const pendingCount =
     bookings?.filter((b) => b.status === 'submitted' || b.status === 'under_review').length ?? 0;
+  const activeServicesCount = services?.filter((s) => s.is_active).length ?? 0;
 
   return (
-    <div className="min-h-[800px] flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
-      {/* Mobile Top App Bar */}
-      <div className="w-full md:hidden flex items-center justify-between p-4 bg-navy text-white rounded-frame shadow-elevated">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsMobileNavOpen(true)}
-            className="p-2 text-white hover:bg-navy-800 rounded-frame focus:outline-none focus:ring-2 focus:ring-sage"
-            aria-label="Open Studio Navigation Menu"
-          >
-            <Menu className="w-5 h-5 stroke-[2.2]" />
-          </button>
-          <div className="flex items-center gap-2">
-            <Camera className="w-5 h-5 text-sage" />
-            <span className="font-display font-bold text-white text-small">
-              FrameLearn Studio
-            </span>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsLogoutDialogOpen(true)}
-          className="p-2 text-white/80 hover:text-white rounded hover:bg-navy-800 text-xs font-semibold flex items-center gap-1.5"
-        >
-          <LogOut className="w-4 h-4 text-sage" />
-          <span>Exit</span>
-        </button>
-      </div>
-
-      {/* Dashboard Sidebar (Desktop Persistent & Mobile Drawer) */}
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row text-navy">
+      {/* Desktop Persistent Sidebar & Mobile Drawer Navigation */}
       <DashboardSidebar
         activeTab={activeTab}
         onSelectTab={(tab) => {
@@ -164,65 +163,97 @@ const PhotographerPortalContent: React.FC = () => {
           setSelectedBookingId(null);
         }}
         pendingBookingsCount={pendingCount}
+        activeServicesCount={activeServicesCount}
         photographerName={photographerName}
         photographerEmail={photographerEmail}
         onLogout={() => setIsLogoutDialogOpen(true)}
+        onAddNewService={() => setIsNewServiceModalOpen(true)}
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
-      {/* Main Management Workspace */}
-      <main className="flex-1 w-full min-w-0" role="region" aria-label="Dashboard Workspace">
-        {activeTab === 'overview' && (
-          <DashboardOverview
-            photographerName={photographerName}
-            bookings={bookings}
-            services={services}
-            onNavigateTab={(tab) => {
-              setActiveTab(tab);
-              setSelectedBookingId(null);
-            }}
-            onSelectBooking={(booking) => {
-              setSelectedBookingId(booking.id);
-              setActiveTab('bookings');
-            }}
-          />
-        )}
+      {/* Main Workspace Frame */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* Top App Bar Navigation */}
+        <DashboardTopBar
+          activeTab={activeTab}
+          onOpenMobileNav={() => setIsMobileNavOpen(true)}
+          onLogout={() => setIsLogoutDialogOpen(true)}
+          onRefresh={activeTab === 'bookings' ? loadBookings : loadServices}
+          isRefreshing={bookingsLoading || servicesLoading}
+          photographerName={photographerName}
+          photographerEmail={photographerEmail}
+        />
 
-        {activeTab === 'bookings' && (
-          <BookingsManagement
-            bookings={bookings}
-            isLoading={bookingsLoading}
-            error={bookingsError}
-            onRefresh={loadBookings}
-            onUpdateStatus={handleUpdateBookingStatus}
-            selectedBookingId={selectedBookingId}
-          />
-        )}
+        {/* Dynamic Section Content */}
+        <main
+          className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto"
+          role="region"
+          aria-label="Dashboard Workspace"
+        >
+          {activeTab === 'overview' && (
+            <DashboardOverview
+              photographerName={photographerName}
+              photographerPhone={photographerPhone}
+              photographerEmail={photographerEmail}
+              bookings={bookings}
+              services={services}
+              onNavigateTab={(tab) => {
+                setActiveTab(tab);
+                setSelectedBookingId(null);
+              }}
+              onSelectBooking={(booking) => {
+                setSelectedBookingId(booking.id);
+                setActiveTab('bookings');
+              }}
+              onAddNewService={() => setIsNewServiceModalOpen(true)}
+            />
+          )}
 
-        {activeTab === 'services' && (
-          <ServicesManagement
-            services={services}
-            isLoading={servicesLoading}
-            error={servicesError}
-            onRefresh={loadServices}
-          />
-        )}
+          {activeTab === 'bookings' && (
+            <BookingsManagement
+              bookings={bookings}
+              isLoading={bookingsLoading}
+              error={bookingsError}
+              onRefresh={loadBookings}
+              onUpdateStatus={handleUpdateBookingStatus}
+              selectedBookingId={selectedBookingId}
+            />
+          )}
 
-        {activeTab === 'profile' && (
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-h2 font-display font-bold text-navy">
-                My Profile
-              </h1>
-              <p className="text-small text-navy-800 mt-1">
-                Manage your public photographer profile, studio contact information, and account details.
-              </p>
+          {activeTab === 'services' && (
+            <ServicesManagement
+              services={services}
+              isLoading={servicesLoading}
+              error={servicesError}
+              onRefresh={loadServices}
+            />
+          )}
+
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-h2 font-display font-bold text-navy">
+                  My Profile
+                </h1>
+                <p className="text-small text-navy-800 mt-1">
+                  Manage your public photographer profile, studio contact information, and account details.
+                </p>
+              </div>
+              <ProfileManagementCard />
             </div>
-            <ProfileManagementCard />
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
+
+      {/* Quick Add Service Modal */}
+      <ServiceFormModal
+        isOpen={isNewServiceModalOpen}
+        serviceToEdit={null}
+        onClose={() => setIsNewServiceModalOpen(false)}
+        onSubmit={handleCreateNewService}
+        isLoading={isCreatingService}
+      />
 
       {/* Confirmation Dialog for Session Termination */}
       <ConfirmDialog
@@ -241,10 +272,8 @@ const PhotographerPortalContent: React.FC = () => {
 
 export const PhotographerPortalPage: React.FC = () => {
   return (
-    <Container size="lg" className="py-6 sm:py-10">
-      <ProtectedRoute>
-        <PhotographerPortalContent />
-      </ProtectedRoute>
-    </Container>
+    <ProtectedRoute>
+      <PhotographerPortalContent />
+    </ProtectedRoute>
   );
 };
