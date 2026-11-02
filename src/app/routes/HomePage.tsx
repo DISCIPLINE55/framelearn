@@ -188,10 +188,10 @@ export const HomePage: React.FC = () => {
             <div className="lg:col-span-7 flex flex-col gap-6 text-left">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4 stroke-[2.5]" />}>
-                  Photography Platform Concept
+                  Professional Photography Studio
                 </Badge>
                 <Badge variant="cream" size="md">
-                  Platform Overview
+                  Ghana • Kumasi & Accra
                 </Badge>
               </div>
 
@@ -308,11 +308,11 @@ export const HomePage: React.FC = () => {
                 <Badge variant="sage" className="w-fit mt-1">Client Session Journey</Badge>
               </CardHeader>
               <CardContent className="p-0 text-body font-medium text-navy-950 leading-relaxed mb-6">
-                A future client interaction journey allowing users to discover service packages, communicate requirements, and request session bookings.
+                Direct client communication allowing you to explore tailored service packages, submit session inquiries, and coordinate your shoot.
               </CardContent>
               <div className="pt-4 border-t border-sage-200">
-                <a href="#about" className="inline-flex items-center gap-2 text-small font-bold text-navy hover:text-sage transition-colors">
-                  <span>Explore Project Vision</span>
+                <a href="#contact" className="inline-flex items-center gap-2 text-small font-bold text-navy hover:text-sage transition-colors">
+                  <span>Book a Session</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </a>
               </div>
@@ -346,9 +346,9 @@ export const HomePage: React.FC = () => {
         <Container size="lg" className="flex flex-col gap-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <SectionHeading
-              eyebrow="Photography Offerings Preview"
+              eyebrow="Photography Offerings"
               title="Professional Photography Services"
-              subtitle="Explore the photography service categories designed for the FrameLearn platform."
+              subtitle="Explore the photography services crafted to capture your milestones and commercial needs."
               className="mb-0"
             />
             <Badge variant="navy" size="md" className="w-fit">
@@ -394,7 +394,7 @@ export const HomePage: React.FC = () => {
       <section id="portfolio" className="py-4">
         <Container size="lg" className="flex flex-col gap-12">
           <SectionHeading
-            eyebrow="Visual Portfolio Preview"
+            eyebrow="Portfolio Gallery"
             title="Curated Photography Showcase"
             subtitle="Explore curated photography work across portraits, weddings, graduation sessions, events, and product photography."
             align="center"
@@ -531,9 +531,9 @@ export const HomePage: React.FC = () => {
                     Get in Touch
                   </Button>
                 </a>
-                <a href="#design-system">
+                <a href="#portfolio">
                   <Button variant="outline" size="md">
-                    Review Project Documentation
+                    View Portfolio
                   </Button>
                 </a>
               </div>
@@ -744,7 +744,7 @@ export const HomePage: React.FC = () => {
         description={selectedService?.subtitle}
         footer={
           <Button variant="primary" onClick={() => setSelectedService(null)}>
-            Close Preview
+            Close Details
           </Button>
         }
       >
@@ -790,7 +790,7 @@ export const HomePage: React.FC = () => {
             />
           )}
           <p className="text-caption font-bold text-navy-800 italic text-center">
-            * Interactive Lightbox Preview — High-resolution proofing and client gallery delivery will be available in future platform updates.
+            * All portfolio photographs are captured and processed by FrameLearn Studio. High-resolution master files delivered to booked clients.
           </p>
         </div>
       </Modal>

@@ -19,3 +19,4 @@ export interface ProfileOperationResult {
 }
 
 export type { Profile, ProfileRole };
+

@@ -43,6 +43,7 @@ export const App: React.FC = () => {
         return <PhotographerPortalPage />;
       case 'design-system':
       case 'docs':
+      case 'documentation':
       case 'components':
       case 'tokens':
       case 'states':
@@ -50,6 +51,9 @@ export const App: React.FC = () => {
       case 'app-states':
       case 'image-foundation':
       case 'architecture-docs':
+      case 'implementation-log':
+      case 'database-docs':
+      case 'milestones':
         return <DesignSystemShowcase />;
       case 'home':
       default:

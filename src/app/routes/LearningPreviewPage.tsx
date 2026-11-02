@@ -31,7 +31,7 @@ export const LearningPreviewPage: React.FC = () => {
 
       <SectionHeading
         eyebrow="Practical Education"
-        title="Learning Hub Showcase"
+        title="Photography Learning Hub"
         subtitle="Practical photography education designed for aspiring photographers developing hands-on technical skills."
       />
 
@@ -52,10 +52,10 @@ export const LearningPreviewPage: React.FC = () => {
       <div className="p-6 bg-cream rounded-frame border-2 border-navy-800 flex items-center justify-between gap-4">
         <div className="flex flex-col">
           <span className="font-bold text-navy">Interactive Learning Hub</span>
-          <span className="text-small text-navy-950 font-medium">Interactive course modules, video guides, downloadable learning resources, and workshop registration will be available in future platform updates.</span>
+          <span className="text-small text-navy-950 font-medium">Hands-on course modules, practical guides, downloadable learning resources, and workshop training crafted for aspiring photographers.</span>
         </div>
         <Badge variant="sage" size="md" icon={<Sparkles className="w-4 h-4" />}>
-          Platform Roadmap
+          Workshops & Courses
         </Badge>
       </div>
     </Container>

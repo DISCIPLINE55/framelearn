@@ -2,7 +2,7 @@ import React from 'react';
 import { FOOTER_PRODUCT_ITEMS } from '../../constants/navigation';
 import { PROJECT_METADATA } from '../../constants/project';
 import { Container } from '../layout/Container';
-import { Camera, ShieldCheck, ExternalLink } from 'lucide-react';
+import { Camera, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -60,16 +60,10 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Legal Shell & Internal Review Area Link */}
+        {/* Bottom Legal Shell */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-small text-white/90 font-medium">
-          <p>© {new Date().getFullYear()} FrameLearn Project Team. All rights reserved.</p>
-          <a
-            href="#design-system"
-            className="inline-flex items-center gap-1.5 font-semibold text-sage hover:text-white transition-colors bg-navy-800 px-3 py-1 rounded-full border border-sage/30"
-          >
-            <span>Internal Design System & Architecture Review</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          <p>© {new Date().getFullYear()} FrameLearn. All rights reserved.</p>
+          <p className="text-caption text-white/70">Kumasi & Accra, Ghana • Professional Photography & Practical Education</p>
         </div>
       </Container>
     </footer>
