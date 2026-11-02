@@ -15,6 +15,7 @@ export interface AuthState {
   isConfigured: boolean;
   connectionStatus: SupabaseConnectionStatus | null;
   signInWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  resetPasswordForEmail: (email: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   testConnection: () => Promise<SupabaseConnectionStatus>;

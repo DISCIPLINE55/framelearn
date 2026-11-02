@@ -8,6 +8,8 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Modal } from '../../components/ui/Modal';
 import { ImageContainer } from '../../components/media/ImageContainer';
+import { useToast } from '../providers/ToastContext';
+import { submitBookingRequest } from '../../features/bookings';
 import {
   Camera,
   BookOpen,
@@ -17,18 +19,29 @@ import {
   CheckCircle2,
   Mail,
   User,
+  Phone,
   MapPin,
   Clock,
   Send,
   Layers,
   Award,
   BookCheck,
+  AlertCircle,
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
+  const { toast } = useToast();
   const [selectedService, setSelectedService] = useState<{ title: string; subtitle?: string; description: string; scope: string } | null>(null);
   const [selectedPortfolioImage, setSelectedPortfolioImage] = useState<{ src: string; title: string; category: string } | null>(null);
-  const [contactFormSubmitted, setContactFormSubmitted] = useState(false);
+
+  // Real Booking Inquiry Form State
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [inquiryMessage, setInquiryMessage] = useState('');
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [inquiryError, setInquiryError] = useState<string | null>(null);
 
   // Photography Services Presentation Data
   const servicesList = [
@@ -565,9 +578,9 @@ export const HomePage: React.FC = () => {
                   <Mail className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-small font-bold text-navy">Email Inquiry</span>
-                  <span className="text-body font-medium text-navy-950">info@framelearn.edu.gh</span>
-                  <span className="text-caption text-navy-800 mt-1">Project Contact Channel</span>
+                  <span className="text-small font-bold text-navy">Official Business Email</span>
+                  <span className="text-body font-medium text-navy-950">framelearn28@gmail.com</span>
+                  <span className="text-caption text-navy-800 mt-1">Direct Photographer Inbox</span>
                 </div>
               </div>
 
@@ -594,57 +607,126 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Contact Form Preview (Non-Functional) */}
+            {/* Real Booking Inquiry Submission Form */}
             <div className="lg:col-span-7 bg-white p-8 rounded-frame border-2 border-sage-300 shadow-subtle flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-h3 font-display font-bold text-navy">Send an Inquiry</h3>
-                <Badge variant="sage" size="sm">Demonstration Form</Badge>
+                <Badge variant="sage" size="sm">Client Inquiry</Badge>
               </div>
 
-              {contactFormSubmitted ? (
-                <div className="p-6 bg-cream rounded-frame border-2 border-sage-400 text-center flex flex-col items-center gap-3">
-                  <CheckCircle2 className="w-10 h-10 text-navy stroke-[2.5]" />
-                  <h4 className="text-h3 font-bold text-navy">Inquiry Preview Received</h4>
-                  <p className="text-body font-medium text-navy-950 max-w-md">
-                    Thank you for testing the contact form preview. Live message dispatching will be activated in future milestones.
+              {inquiryError && (
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="p-3.5 rounded-frame bg-red-50 border border-red-300 text-red-900 text-small flex items-start gap-2.5"
+                >
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs">{inquiryError}</span>
+                </div>
+              )}
+
+              {inquirySubmitted ? (
+                <div className="p-8 bg-cream rounded-frame border-2 border-sage-400 text-center flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-navy text-sage flex items-center justify-center shadow-subtle">
+                    <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <h4 className="text-h3 font-bold text-navy">Inquiry Received</h4>
+                  <p className="text-body font-medium text-navy-950 max-w-md leading-relaxed">
+                    Thank you. Your inquiry has been saved securely to the database. The photographer will review your request and get in touch.
                   </p>
-                  <Button variant="secondary" size="sm" onClick={() => setContactFormSubmitted(false)}>
-                    Reset Form Preview
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setInquirySubmitted(false)}
+                  >
+                    Send Another Inquiry
                   </Button>
                 </div>
               ) : (
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault();
-                    setContactFormSubmitted(true);
+                    setInquiryError(null);
+                    setIsSubmittingInquiry(true);
+                    const res = await submitBookingRequest({
+                      client_name: clientName,
+                      client_email: clientEmail,
+                      client_phone: clientPhone,
+                      message: inquiryMessage,
+                    });
+                    setIsSubmittingInquiry(false);
+                    if (res.success) {
+                      setInquirySubmitted(true);
+                      toast.success('Your session inquiry was submitted successfully.', {
+                        title: 'Inquiry Recorded',
+                      });
+                      setClientName('');
+                      setClientEmail('');
+                      setClientPhone('');
+                      setInquiryMessage('');
+                    } else {
+                      setInquiryError(res.error || 'Failed to submit inquiry.');
+                      toast.error(res.error || 'Failed to submit inquiry.', {
+                        title: 'Submission Failed',
+                      });
+                    }
                   }}
                   className="flex flex-col gap-4"
+                  noValidate
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
                       label="Your Name"
                       placeholder="e.g. Ismail Mensah"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
                       required
                       leftIcon={<User className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
+                      fullWidth
                     />
                     <Input
                       label="Email Address"
                       type="email"
                       placeholder="e.g. ismail@example.com"
+                      value={clientEmail}
+                      onChange={(e) => setClientEmail(e.target.value)}
                       required
                       leftIcon={<Mail className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
+                      fullWidth
                     />
                   </div>
+                  <Input
+                    label="Phone Number"
+                    type="tel"
+                    placeholder="e.g. +233 24 123 4567"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    helperText="Required for session coordination"
+                    required
+                    leftIcon={<Phone className="w-4 h-4 text-navy-800 stroke-[2.5]" />}
+                    fullWidth
+                  />
                   <Textarea
                     label="Inquiry / Workshop Note"
                     placeholder="Provide details about your session inquiry or learning interest..."
                     rows={4}
+                    value={inquiryMessage}
+                    onChange={(e) => setInquiryMessage(e.target.value)}
                     required
                   />
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-caption font-bold text-navy-800">* Demonstration Preview — Interactive submission active upon backend connection</span>
-                    <Button type="submit" variant="primary" rightIcon={<Send className="w-4 h-4 stroke-[2.5]" />}>
-                      Send Inquiry (Preview)
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span className="text-caption font-medium text-navy-800">
+                      Inquiries persist directly to the database. Client details remain strictly confidential.
+                    </span>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      isLoading={isSubmittingInquiry}
+                      disabled={isSubmittingInquiry}
+                      rightIcon={<Send className="w-4 h-4 stroke-[2.5]" />}
+                      className="w-full sm:w-auto shrink-0"
+                    >
+                      {isSubmittingInquiry ? 'Sending...' : 'Send Inquiry'}
                     </Button>
                   </div>
                 </form>
@@ -672,9 +754,16 @@ export const HomePage: React.FC = () => {
             <span className="text-caption font-bold text-navy">Service Scope Summary</span>
             <p className="text-small font-semibold text-navy-950">{selectedService?.scope}</p>
           </div>
-          <p className="text-caption font-bold text-navy-800 italic">
-            * Demonstration Preview — Live session booking and direct scheduling will be available in future platform updates.
-          </p>
+          <div className="pt-2 flex items-center justify-between">
+            <span className="text-caption font-bold text-navy-800">
+              Ready to proceed with this service?
+            </span>
+            <a href="#contact" onClick={() => setSelectedService(null)}>
+              <Button variant="primary" size="sm">
+                Inquire for Booking
+              </Button>
+            </a>
+          </div>
         </div>
       </Modal>
 

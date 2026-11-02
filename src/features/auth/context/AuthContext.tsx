@@ -172,10 +172,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast.error(error.message, {
+        let displayError = error.message;
+        if (error.message.toLowerCase().includes('invalid login credentials')) {
+          displayError = 'Invalid login credentials. If your photographer account has not yet been provisioned in Supabase Auth, account provisioning is required.';
+        }
+        toast.error(displayError, {
           title: 'Sign In Failed',
         });
-        return { success: false, error: error.message };
+        return { success: false, error: displayError };
       }
 
       if (data.user) {
@@ -213,6 +217,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const resetPasswordForEmail = async (
+    email: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!configured) {
+      const errorMsg =
+        'Supabase backend credentials are not configured in environment variables.';
+      toast.error(errorMsg, {
+        title: 'Backend Configuration Missing',
+      });
+      return { success: false, error: errorMsg };
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/#portal`,
+      });
+
+      if (error) {
+        toast.error(error.message, {
+          title: 'Password Recovery Failed',
+        });
+        return { success: false, error: error.message };
+      }
+
+      toast.success(
+        'Password recovery instructions have been sent to your email address if an account exists.',
+        {
+          title: 'Recovery Email Sent',
+        }
+      );
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error ? err.message : 'An unexpected error occurred during password recovery.';
+      toast.error(errorMsg, {
+        title: 'Recovery Error',
+      });
+      return { success: false, error: errorMsg };
     }
   };
 
@@ -263,6 +308,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isConfigured: configured,
     connectionStatus,
     signInWithEmail,
+    resetPasswordForEmail,
     signOut,
     refreshProfile,
     testConnection,
@@ -288,6 +334,7 @@ export const useAuth = (): AuthState => {
       isConfigured: false,
       connectionStatus: null,
       signInWithEmail: async () => ({ success: false, error: 'Auth context not available' }),
+      resetPasswordForEmail: async () => ({ success: false, error: 'Auth context not available' }),
       signOut: async () => {},
       refreshProfile: async () => {},
       testConnection: async () => ({

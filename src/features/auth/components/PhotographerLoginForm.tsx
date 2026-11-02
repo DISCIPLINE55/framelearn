@@ -3,7 +3,7 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Badge } from '../../../components/ui/Badge';
-import { Lock, Mail, ShieldAlert, KeyRound, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, KeyRound, AlertCircle, ArrowLeft, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export interface PhotographerLoginFormProps {
@@ -15,20 +15,39 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
   onSuccess,
   className = '',
 }) => {
-  const { signInWithEmail, isConfigured } = useAuth();
+  const { signInWithEmail, resetPasswordForEmail, isConfigured } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setSuccessNotice(null);
 
     if (!isConfigured) {
       setErrorMessage(
         'Supabase backend credentials are not set in .env. Live authentication cannot proceed.'
       );
+      return;
+    }
+
+    if (isRecoveryMode) {
+      if (!email.trim()) {
+        setErrorMessage('Please enter your photographer email address.');
+        return;
+      }
+      setIsSubmitting(true);
+      const res = await resetPasswordForEmail(email);
+      setIsSubmitting(false);
+      if (res.success) {
+        setSuccessNotice('Recovery email sent. Check your inbox for password reset instructions.');
+      } else if (res.error) {
+        setErrorMessage(res.error);
+      }
       return;
     }
 
@@ -58,10 +77,12 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
           Photographer Access
         </Badge>
         <h2 className="text-h3 font-display font-bold text-navy">
-          Photographer Portal
+          {isRecoveryMode ? 'Reset Password' : 'Photographer Portal'}
         </h2>
         <p className="text-small text-navy-800 mt-1 max-w-sm">
-          Restricted management gateway for independent photographer Arafat Nabuku Jansu.
+          {isRecoveryMode
+            ? 'Request a secure recovery link for your photographer account.'
+            : 'Restricted management gateway for independent photographer Arafat Nabuku Jansu.'}
         </p>
       </div>
 
@@ -99,6 +120,17 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
         </div>
       )}
 
+      {successNotice && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-4 p-3 rounded-frame bg-sage-50 border border-sage-300 text-navy text-small flex items-start gap-2"
+        >
+          <Mail className="w-4 h-4 text-navy flex-shrink-0 mt-0.5" />
+          <span className="text-xs">{successNotice}</span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div>
           <label
@@ -112,7 +144,7 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="photographer@framelearn.com"
+            placeholder="framelearn28@gmail.com"
             autoComplete="email"
             leftIcon={<Mail className="w-4 h-4 text-navy/70" />}
             disabled={isSubmitting || !isConfigured}
@@ -121,26 +153,41 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="photographer-password"
-            className="block text-xs font-bold uppercase tracking-wider text-navy mb-1.5"
-          >
-            Password
-          </label>
-          <Input
-            id="photographer-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••••••"
-            autoComplete="current-password"
-            leftIcon={<KeyRound className="w-4 h-4 text-navy/70" />}
-            disabled={isSubmitting || !isConfigured}
-            fullWidth
-            required
-          />
-        </div>
+        {!isRecoveryMode && (
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label
+                htmlFor="photographer-password"
+                className="block text-xs font-bold uppercase tracking-wider text-navy"
+              >
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRecoveryMode(true);
+                  setErrorMessage(null);
+                  setSuccessNotice(null);
+                }}
+                className="text-xs font-medium text-navy hover:text-sage transition-colors underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
+            <Input
+              id="photographer-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              autoComplete="current-password"
+              leftIcon={<KeyRound className="w-4 h-4 text-navy/70" />}
+              disabled={isSubmitting || !isConfigured}
+              fullWidth
+              required
+            />
+          </div>
+        )}
 
         <div className="pt-2">
           <Button
@@ -150,11 +197,32 @@ export const PhotographerLoginForm: React.FC<PhotographerLoginFormProps> = ({
             fullWidth
             isLoading={isSubmitting}
             disabled={!isConfigured || isSubmitting}
-            leftIcon={<Lock className="w-4 h-4" />}
+            leftIcon={isRecoveryMode ? <Send className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           >
-            {isConfigured ? 'Sign In as Photographer' : 'Configuration Required in .env'}
+            {isConfigured
+              ? isRecoveryMode
+                ? 'Send Recovery Email'
+                : 'Sign In as Photographer'
+              : 'Configuration Required in .env'}
           </Button>
         </div>
+
+        {isRecoveryMode && (
+          <div className="text-center pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsRecoveryMode(false);
+                setErrorMessage(null);
+                setSuccessNotice(null);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs text-navy hover:text-sage font-semibold"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Sign In</span>
+            </button>
+          </div>
+        )}
       </form>
 
       <div className="mt-6 pt-4 border-t border-navy-100 text-center">
