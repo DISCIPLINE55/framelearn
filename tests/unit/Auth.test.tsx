@@ -61,4 +61,32 @@ describe('Auth Context and Photographer Login Primitives', () => {
 
     expect(screen.getByTestId('is-authenticated').textContent).toBe('false');
   });
+
+  it('toggles to password recovery mode and back to sign in', async () => {
+    const user = userEvent.setup();
+    render(
+      <AppProvider>
+        <PhotographerLoginForm />
+      </AppProvider>
+    );
+
+    // Initial state: password input is present
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+
+    // Click Forgot Password?
+    const forgotBtn = screen.getByRole('button', { name: /forgot password\?/i });
+    await user.click(forgotBtn);
+
+    // Recovery mode: heading is Reset Password and password input is omitted
+    expect(screen.getByRole('heading', { name: /reset password/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send recovery email|configuration required in \.env/i })).toBeInTheDocument();
+
+    // Click Back to Sign In
+    const backBtn = screen.getByRole('button', { name: /back to sign in/i });
+    await user.click(backBtn);
+
+    expect(screen.getByRole('heading', { name: /photographer portal/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+  });
 });

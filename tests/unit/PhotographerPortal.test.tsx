@@ -61,6 +61,7 @@ describe('PhotographerPortalPage Component and Business View', () => {
       isConfigured: true,
       connectionStatus: null,
       signInWithEmail: vi.fn(),
+      resetPasswordForEmail: vi.fn(),
       signOut: mockSignOut,
       refreshProfile: vi.fn(),
       testConnection: mockTestConnection,
@@ -84,6 +85,15 @@ describe('PhotographerPortalPage Component and Business View', () => {
     expect(screen.getByText(/portrait photography/i)).toBeInTheDocument();
     expect(screen.getByText(/weddings & event photography/i)).toBeInTheDocument();
     expect(screen.getByText(/graduation photography/i)).toBeInTheDocument();
+
+    // Verify Dashboard statistics cards
+    expect(screen.getByText(/active disciplines/i)).toBeInTheDocument();
+    expect(screen.getByText(/total inquiries/i)).toBeInTheDocument();
+    expect(screen.getByText(/awaiting review/i)).toBeInTheDocument();
+    expect(screen.getByText(/confirmed sessions/i)).toBeInTheDocument();
+
+    // Verify Inquiries management header
+    expect(screen.getByRole('heading', { name: /client booking inquiries/i })).toBeInTheDocument();
 
     // Verify End Session triggers confirmation dialog
     const endSessionBtn = screen.getByRole('button', { name: /end session/i });
