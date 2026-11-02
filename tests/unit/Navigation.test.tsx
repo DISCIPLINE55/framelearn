@@ -33,4 +33,15 @@ describe('Header & Navigation Regression Tests', () => {
     // Menu opens
     expect(screen.getByLabelText(/Toggle Navigation Menu/i)).toBeInTheDocument();
   });
+
+  it('renders login button and navigates to login route when clicked', () => {
+    const onNavigate = vi.fn();
+    render(<Header currentRoute="home" onNavigate={onNavigate} />);
+
+    const loginLinks = screen.getAllByRole('link', { name: /login/i });
+    expect(loginLinks.length).toBeGreaterThan(0);
+
+    fireEvent.click(loginLinks[0]);
+    expect(onNavigate).toHaveBeenCalledWith('login');
+  });
 });

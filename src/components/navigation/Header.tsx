@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PUBLIC_NAV_ITEMS } from '../../constants/navigation';
 import { Container } from '../layout/Container';
 import { Button } from '../ui/Button';
-import { Menu, X, Camera, ArrowRight } from 'lucide-react';
+import { Menu, X, Camera, LogIn } from 'lucide-react';
 
 export interface HeaderProps {
   currentRoute?: string;
@@ -74,11 +74,11 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute = 'home', onNavigat
             })}
           </nav>
 
-          {/* Primary Client CTA */}
+          {/* Studio Login CTA */}
           <div className="hidden lg:flex items-center gap-2.5">
-            <a href="#portfolio" onClick={() => handleLinkClick('#portfolio')}>
-              <Button variant="secondary" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />}>
-                Explore Portfolio
+            <a href="#login" onClick={() => handleLinkClick('#login')}>
+              <Button variant="secondary" size="sm" leftIcon={<LogIn className="w-3.5 h-3.5 stroke-[2.5]" />}>
+                Login
               </Button>
             </a>
           </div>
@@ -111,9 +111,9 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute = 'home', onNavigat
               ))}
 
               <div className="pt-4 mt-2 border-t border-navy-800 flex flex-col gap-2 px-2">
-                <a href="#portfolio" onClick={() => handleLinkClick('#portfolio')} className="w-full">
-                  <Button variant="secondary" size="md" fullWidth>
-                    Explore Portfolio
+                <a href="#login" onClick={() => handleLinkClick('#login')} className="w-full">
+                  <Button variant="secondary" size="md" fullWidth leftIcon={<LogIn className="w-4 h-4 stroke-[2.5]" />}>
+                    Login
                   </Button>
                 </a>
               </div>
