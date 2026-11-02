@@ -16,14 +16,14 @@ export const AboutPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Platform Architecture & Vision
+          Our Story & Mission
         </Badge>
       </div>
 
       <SectionHeading
-        eyebrow="Project Purpose & Vision"
+        eyebrow="About FrameLearn"
         title="About FrameLearn"
-        subtitle="Unifying photography practice, client service delivery, and skills education under one modern web platform."
+        subtitle="Unifying photography practice, client service delivery, and practical skills education under one modern web platform."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

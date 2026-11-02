@@ -151,3 +151,4 @@ export async function updatePhotographerProfile(
     return { success: false, error: msg };
   }
 }
+

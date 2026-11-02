@@ -78,7 +78,7 @@ export const ServicesPreviewPage: React.FC = () => {
           </Button>
         </a>
         <Badge variant="navy" size="md">
-          Live Services Catalog
+          Services & Packages
         </Badge>
       </div>
 
@@ -136,9 +136,6 @@ export const ServicesPreviewPage: React.FC = () => {
                       <Badge variant="sage" size="sm">
                         {service.category}
                       </Badge>
-                      <span className="text-[11px] font-mono text-navy/60">
-                        {service.slug}
-                      </span>
                     </div>
                     <CardTitle>{service.name}</CardTitle>
                   </CardHeader>

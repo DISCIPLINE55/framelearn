@@ -18,7 +18,7 @@ export const PortfolioPreviewPage: React.FC = () => {
         </a>
         <div className="flex items-center gap-2">
           <Badge variant="sage" size="md">
-            Interactive Portfolio Active
+            Featured Portfolio
           </Badge>
           <Badge variant="navy" size="md">
             Curated Showcase
@@ -28,7 +28,7 @@ export const PortfolioPreviewPage: React.FC = () => {
 
       <SectionHeading
         eyebrow="Photography Showcase"
-        title="Interactive Portfolio"
+        title="Portfolio Gallery"
         subtitle="Explore curated photography work across portraits, graduation, weddings & events, outdoor landscapes, and product disciplines."
       />
 
