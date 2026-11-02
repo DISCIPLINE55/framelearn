@@ -51,7 +51,7 @@ export const HomePage: React.FC = () => {
       subtitle: 'Portrait sessions & ceremony coverage',
       image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80',
       description: 'Commemorating academic achievements with classic, high-resolution portraiture and outdoor campus sessions.',
-      scope: 'Includes individual cap-and-gown portraits, family group portraits, and full digital gallery delivery in future milestones.',
+      scope: 'Includes individual cap-and-gown portraits, family group portraits, and full digital gallery delivery.',
     },
     {
       id: 'wedding',
@@ -632,7 +632,7 @@ export const HomePage: React.FC = () => {
                   </div>
                   <h4 className="text-h3 font-bold text-navy">Inquiry Received</h4>
                   <p className="text-body font-medium text-navy-950 max-w-md leading-relaxed">
-                    Thank you. Your inquiry has been saved securely to the database. The photographer will review your request and get in touch.
+                    Thank you. Your booking inquiry has been received securely. The photographer will review your request and get in touch with you shortly.
                   </p>
                   <Button
                     variant="secondary"
@@ -716,7 +716,7 @@ export const HomePage: React.FC = () => {
                   />
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <span className="text-caption font-medium text-navy-800">
-                      Inquiries persist directly to the database. Client details remain strictly confidential.
+                      Your booking details are confidential and only used to coordinate your session.
                     </span>
                     <Button
                       type="submit"
