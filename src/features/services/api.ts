@@ -16,7 +16,7 @@ export async function fetchActiveServices(): Promise<{
   if (!isSupabaseConfigured()) {
     return {
       data: [],
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio catalog service is currently unavailable.',
     };
   }
 
@@ -49,7 +49,7 @@ export async function fetchAllServices(): Promise<{
   if (!isSupabaseConfigured()) {
     return {
       data: [],
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio catalog service is currently unavailable.',
     };
   }
 
@@ -83,7 +83,7 @@ export async function fetchServicePackages(
   if (!isSupabaseConfigured()) {
     return {
       data: [],
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio catalog service is currently unavailable.',
     };
   }
 
@@ -121,7 +121,7 @@ export async function toggleServiceActive(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio catalog service is currently unavailable.',
     };
   }
 

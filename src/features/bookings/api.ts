@@ -86,7 +86,7 @@ export async function submitBookingRequest(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: 'Supabase backend credentials are not configured in environment variables.',
+      error: 'The studio booking service is currently unavailable. Please try again later.',
     };
   }
 
@@ -132,7 +132,7 @@ export async function fetchBookingRequests(): Promise<{
   if (!isSupabaseConfigured()) {
     return {
       data: [],
-      error: 'Supabase backend credentials are not configured.',
+      error: 'The studio booking service is currently unavailable. Please try again later.',
     };
   }
 
@@ -181,7 +181,7 @@ export async function updateBookingStatus(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: 'Supabase backend credentials are not configured.',
+      error: 'The studio booking service is currently unavailable. Please try again later.',
     };
   }
 
@@ -243,7 +243,7 @@ export async function fetchBookingStatusHistory(
   if (!isSupabaseConfigured()) {
     return {
       data: [],
-      error: 'Supabase backend credentials are not configured.',
+      error: 'The studio booking service is currently unavailable. Please try again later.',
     };
   }
 

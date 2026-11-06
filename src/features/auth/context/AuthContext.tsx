@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Missing profile: NEVER fallback to 'admin' or user_metadata
       setProfile(null);
       setRole(null);
-      setProfileError('No profile record found in the database for this user.');
+      setProfileError('No profile information found for this studio account.');
       return null;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unexpected error fetching profile.';
@@ -171,9 +171,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        let displayError = error.message;
-        if (error.message.toLowerCase().includes('invalid login credentials')) {
+        let displayError = 'An error occurred while signing in. Please check your credentials and try again.';
+        const lower = error.message.toLowerCase();
+        if (lower.includes('invalid') || lower.includes('credentials') || lower.includes('grant')) {
           displayError = 'Invalid email address or password. Please check your credentials and try again.';
+        } else if (lower.includes('network') || lower.includes('fetch') || lower.includes('connection')) {
+          displayError = 'Unable to reach the studio service. Please check your internet connection.';
+        } else if (lower.includes('rate limit') || lower.includes('too many')) {
+          displayError = 'Too many sign-in attempts. Please wait a few moments and try again.';
         }
         toast.error(displayError, {
           title: 'Sign In Failed',
@@ -236,10 +241,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast.error(error.message, {
+        let displayError = 'Unable to send password recovery instructions. Please try again.';
+        const lower = error.message.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many')) {
+          displayError = 'Too many reset requests. Please wait a few moments before trying again.';
+        } else if (lower.includes('network') || lower.includes('fetch')) {
+          displayError = 'Unable to reach the studio service. Please check your internet connection.';
+        }
+        toast.error(displayError, {
           title: 'Password Recovery Failed',
         });
-        return { success: false, error: error.message };
+        return { success: false, error: displayError };
       }
 
       toast.success(
@@ -265,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { error } = await supabase.auth.signOut();
         if (error) {
           console.warn('[FrameLearn Auth] Sign out error:', error.message);
-          toast.error(`Sign out failed: ${error.message}`, {
+          toast.error('Unable to sign out cleanly. Please close your tab or try again.', {
             title: 'Sign Out Error',
           });
           return;
