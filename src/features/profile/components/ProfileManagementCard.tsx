@@ -146,7 +146,7 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  const displayInitials = getInitials(profile?.full_name || 'Arafat Nabuku Jansu');
+  const displayInitials = getInitials(profile?.full_name || 'Studio Owner');
   const lastUpdated = profile?.updated_at
     ? new Date(profile.updated_at).toLocaleString('en-GB', {
         day: 'numeric',
@@ -244,7 +244,7 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
                 <span>Display Name</span>
               </div>
               <span className="text-h3 font-bold text-navy block">
-                {profile?.full_name || 'Arafat Nabuku Jansu'}
+                {profile?.full_name || 'Studio Owner'}
               </span>
               <span className="text-[11px] text-navy/70 mt-1 block">
                 Official business title for booking confirmations
@@ -263,10 +263,10 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
                 </span>
               </div>
               <span className="text-body font-bold text-navy block font-mono">
-                {profile?.email || user?.email || 'framelearn28@gmail.com'}
+                {profile?.email || user?.email || 'Not specified'}
               </span>
               <span className="text-[11px] text-navy/70 mt-1 block">
-                Governed strictly by authenticated Supabase session
+                Managed through your secure studio account
               </span>
             </div>
 
@@ -301,7 +301,7 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
                 </Badge>
               </div>
               <span className="text-[11px] text-navy/70 mt-1 block">
-                Authoritative permission verified via PostgreSQL profiles table
+                Verified studio administrator access
               </span>
             </div>
 
@@ -329,7 +329,7 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
                 {lastUpdated}
               </span>
               <span className="text-[11px] text-navy/70 mt-1 block">
-                Synchronized with Supabase PostgreSQL
+                Saved to your studio account
               </span>
             </div>
           </div>
@@ -392,9 +392,9 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
               id="profile-email-readonly"
               label="Account Email (Read-Only)"
               type="email"
-              value={profile?.email || user?.email || 'framelearn28@gmail.com'}
+              value={profile?.email || user?.email || ''}
               disabled
-              helperText="Email is bound to Supabase Auth credentials and cannot be edited directly."
+              helperText="Email is bound to your sign-in credentials and cannot be edited here."
               leftIcon={<Lock className="w-4 h-4 text-navy-800" />}
               fullWidth
             />
@@ -405,9 +405,9 @@ export const ProfileManagementCard: React.FC<ProfileManagementCardProps> = ({
             <Lock className="w-5 h-5 text-navy flex-shrink-0 mt-0.5" />
             <div className="text-xs text-navy-900 leading-relaxed">
               <span className="font-bold block text-navy mb-0.5">
-                Security Policy: Role Authorization is Read-Only
+                Account Security: Role is Protected
               </span>
-              User role is assigned as <strong className="font-mono">admin</strong> based on the trusted database profile. Non-administrative users cannot grant or modify permissions.
+              Your account is configured with studio administrator privileges. Role permissions cannot be altered through profile management.
             </div>
           </div>
 

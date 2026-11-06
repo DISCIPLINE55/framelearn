@@ -34,7 +34,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <Container size="sm" className="py-16">
         <LoadingState
           title="Verifying Authorization"
-          message="Checking photographer session and database permissions..."
+          message="Checking photographer session and permissions..."
         />
       </Container>
     );

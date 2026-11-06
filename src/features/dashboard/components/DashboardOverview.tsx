@@ -35,7 +35,7 @@ export interface DashboardOverviewProps {
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   photographerName,
   photographerPhone,
-  photographerEmail = 'framelearn28@gmail.com',
+  photographerEmail,
   bookings,
   services,
   onNavigateTab,
@@ -49,6 +49,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     month: 'long',
     day: 'numeric',
   }).format(new Date());
+
+  const isBookingsLoaded = bookings !== null;
+  const isServicesLoaded = services !== null;
 
   // Genuine statistics derived strictly from real database records
   const totalInquiries = bookings?.length ?? 0;
@@ -85,13 +88,19 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               Welcome back, {photographerName}
             </h1>
             <p className="text-small text-white/90 leading-relaxed font-medium">
-              You have{' '}
-              <strong className="text-sage font-bold">
-                {pendingInquiries} {pendingInquiries === 1 ? 'inquiry' : 'inquiries'}
-              </strong>{' '}
-              requiring review and{' '}
-              <strong className="text-white font-bold">{confirmedBookings} confirmed</strong> photography{' '}
-              {confirmedBookings === 1 ? 'session' : 'sessions'} scheduled.
+              {!isBookingsLoaded ? (
+                <span>Loading studio inquiries and scheduled sessions...</span>
+              ) : (
+                <>
+                  You have{' '}
+                  <strong className="text-sage font-bold">
+                    {pendingInquiries} {pendingInquiries === 1 ? 'inquiry' : 'inquiries'}
+                  </strong>{' '}
+                  requiring review and{' '}
+                  <strong className="text-white font-bold">{confirmedBookings} confirmed</strong> photography{' '}
+                  {confirmedBookings === 1 ? 'session' : 'sessions'} scheduled.
+                </>
+              )}
             </p>
           </div>
 
@@ -102,7 +111,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               onClick={() => onNavigateTab('bookings')}
               leftIcon={<Inbox className="w-4 h-4 stroke-[2.2]" />}
             >
-              View Inquiries ({totalInquiries})
+              View Inquiries ({isBookingsLoaded ? totalInquiries : '…'})
             </Button>
             {onAddNewService && (
               <Button
@@ -137,10 +146,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-h1 font-display font-bold text-navy">
-              {bookings !== null ? totalInquiries : '—'}
+              {isBookingsLoaded ? totalInquiries : '—'}
             </span>
             <Badge variant="outline" size="sm" className="text-navy-800 border-navy/20">
-              All-Time
+              {isBookingsLoaded ? 'All-Time' : 'Loading…'}
             </Badge>
           </div>
           <div className="flex items-center justify-between text-caption text-navy/70 mt-2 font-medium">
@@ -165,10 +174,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-h1 font-display font-bold text-amber-700">
-              {bookings !== null ? pendingInquiries : '—'}
+              {isBookingsLoaded ? pendingInquiries : '—'}
             </span>
             <Badge variant="cream" size="sm" className="border-amber-400 text-amber-900 bg-amber-50 font-bold">
-              Action Needed
+              {isBookingsLoaded ? (pendingInquiries > 0 ? 'Action Needed' : 'Clear') : 'Loading…'}
             </Badge>
           </div>
           <div className="flex items-center justify-between text-caption text-amber-800 mt-2 font-medium">
@@ -193,10 +202,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-h1 font-display font-bold text-sage">
-              {bookings !== null ? confirmedBookings : '—'}
+              {isBookingsLoaded ? confirmedBookings : '—'}
             </span>
             <Badge variant="sage" size="sm">
-              Scheduled
+              {isBookingsLoaded ? 'Scheduled' : 'Loading…'}
             </Badge>
           </div>
           <div className="flex items-center justify-between text-caption text-navy/70 mt-2 font-medium">
@@ -221,10 +230,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-h1 font-display font-bold text-navy">
-              {bookings !== null ? completedBookings : '—'}
+              {isBookingsLoaded ? completedBookings : '—'}
             </span>
             <Badge variant="navy" size="sm">
-              Fulfilled
+              {isBookingsLoaded ? 'Fulfilled' : 'Loading…'}
             </Badge>
           </div>
           <div className="flex items-center justify-between text-caption text-navy/70 mt-2 font-medium">
@@ -258,7 +267,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </Button>
             </div>
 
-            {pendingQueue.length === 0 ? (
+            {!isBookingsLoaded ? (
+              <Card variant="default" className="p-6 text-center bg-white border border-sage-200">
+                <p className="text-small font-medium text-navy/70">Loading inquiries awaiting action...</p>
+              </Card>
+            ) : pendingQueue.length === 0 ? (
               <Card variant="default" className="p-6 text-center bg-white border-2 border-sage-200">
                 <CheckCircle2 className="w-10 h-10 text-sage mx-auto mb-2 opacity-80" />
                 <p className="text-small font-bold text-navy">All Caught Up!</p>
@@ -325,7 +338,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               Recent Studio Activity
             </h2>
 
-            {recentInquiries.length === 0 ? (
+            {!isBookingsLoaded ? (
+              <Card variant="default" className="p-6 text-center bg-white border border-sage-200">
+                <p className="text-small font-medium text-navy/70">Loading recent studio activity...</p>
+              </Card>
+            ) : recentInquiries.length === 0 ? (
               <Card variant="default" className="p-6 text-center bg-white border border-sage-200">
                 <Inbox className="w-8 h-8 text-sage mx-auto mb-2 opacity-50" />
                 <p className="text-small font-medium text-navy/70">No booking requests submitted yet.</p>
@@ -387,12 +404,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </div>
               </div>
               <Badge variant="sage" size="sm">
-                {activeServices.length} Active
+                {isServicesLoaded ? `${activeServices.length} Active` : 'Loading…'}
               </Badge>
             </div>
 
             <p className="text-small text-navy-800 leading-relaxed font-medium">
-              FrameLearn currently has {activeServices.length} photography offerings displayed in the public catalog.
+              {!isServicesLoaded
+                ? 'Loading studio service offerings...'
+                : `FrameLearn currently has ${activeServices.length} photography offerings displayed in the public catalog.`}
             </p>
 
             <div className="space-y-2">
@@ -444,18 +463,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 </div>
               </div>
               <Badge variant="cream" size="sm">
-                Verified
+                Studio Owner
               </Badge>
             </div>
 
             <div className="space-y-2 text-small text-navy-800">
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-sage flex-shrink-0" />
-                <span className="truncate font-semibold">{photographerEmail}</span>
+                <span className="truncate font-semibold">
+                  {photographerEmail || 'Not specified'}
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-sage flex-shrink-0" />
-                <span className="truncate font-semibold">{photographerPhone || '+233 24 123 4567'}</span>
+                <span className="truncate font-semibold">
+                  {photographerPhone || 'Not specified in profile'}
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <MapPin className="w-4 h-4 text-sage flex-shrink-0" />

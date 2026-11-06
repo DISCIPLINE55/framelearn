@@ -55,7 +55,7 @@ export async function fetchPhotographerProfile(
   if (!isSupabaseConfigured()) {
     return {
       data: null,
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio profile service is currently unavailable.',
     };
   }
 
@@ -109,7 +109,7 @@ export async function updatePhotographerProfile(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: 'Supabase backend credentials are not configured.',
+      error: 'Studio profile service is currently unavailable.',
     };
   }
 
@@ -137,7 +137,7 @@ export async function updatePhotographerProfile(
     if (!data) {
       return {
         success: false,
-        error: 'Profile record not found in the database. Account provisioning is required.',
+        error: 'Profile information could not be found for this studio account.',
       };
     }
 

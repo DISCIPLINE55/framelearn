@@ -112,21 +112,23 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         {/* Photographer Identity Card */}
         <div className="p-3.5 rounded-frame bg-navy-800/90 border border-navy-700/80 shadow-xs flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-sage text-navy font-bold flex items-center justify-center text-small flex-shrink-0 shadow-xs">
-            {photographerName.charAt(0).toUpperCase()}
+            {(photographerName || 'A').charAt(0).toUpperCase()}
           </div>
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="text-small font-bold text-white truncate">
-                {photographerName}
+                {photographerName || 'Studio Owner'}
               </span>
               <ShieldCheck className="w-3.5 h-3.5 text-sage flex-shrink-0" />
             </div>
             <span className="text-[11px] text-sage font-semibold truncate">
               Studio Owner & Photographer
             </span>
-            <span className="text-[10px] text-white/60 truncate">
-              {photographerEmail}
-            </span>
+            {photographerEmail && (
+              <span className="text-[10px] text-white/60 truncate">
+                {photographerEmail}
+              </span>
+            )}
           </div>
         </div>
 

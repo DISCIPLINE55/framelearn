@@ -79,12 +79,6 @@ export const DashboardTopBar: React.FC<DashboardTopBarProps> = ({
 
       {/* Right: Actions, Status & User Pill */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
-        {/* Studio Live Status Indicator */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Studio Active</span>
-        </div>
-
         {onRefresh && (
           <Button
             variant="outline"
@@ -93,7 +87,7 @@ export const DashboardTopBar: React.FC<DashboardTopBarProps> = ({
             isLoading={isRefreshing}
             leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
             className="text-xs hidden sm:inline-flex py-1.5 px-3"
-            title="Refresh database records"
+            title="Refresh studio records"
           >
             Refresh
           </Button>
@@ -113,15 +107,17 @@ export const DashboardTopBar: React.FC<DashboardTopBarProps> = ({
         {/* Quick User Avatar Pill */}
         <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
           <div className="w-8 h-8 rounded-full bg-navy text-sage font-bold flex items-center justify-center text-xs shadow-xs">
-            {photographerName.charAt(0).toUpperCase()}
+            {(photographerName || 'A').charAt(0).toUpperCase()}
           </div>
           <div className="hidden xl:flex flex-col text-left min-w-0">
             <span className="text-xs font-bold text-navy truncate max-w-[130px]">
-              {photographerName}
+              {photographerName || 'Studio Owner'}
             </span>
-            <span className="text-[10px] text-slate-500 truncate max-w-[130px]">
-              {photographerEmail}
-            </span>
+            {photographerEmail && (
+              <span className="text-[10px] text-slate-500 truncate max-w-[130px]">
+                {photographerEmail}
+              </span>
+            )}
           </div>
 
           <button

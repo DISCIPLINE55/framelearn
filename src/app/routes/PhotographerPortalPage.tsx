@@ -26,7 +26,7 @@ import {
 } from '../../features/dashboard';
 
 const PhotographerPortalContent: React.FC = () => {
-  const { user, profile, signOut, isConfigured } = useAuth();
+  const { user, profile, signOut, isConfigured, isProfileLoading, refreshProfile } = useAuth();
   const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
@@ -146,8 +146,20 @@ const PhotographerPortalContent: React.FC = () => {
     window.location.hash = '#home';
   };
 
-  const photographerName = profile?.full_name || 'Arafat Nabuku Jansu';
-  const photographerEmail = profile?.email || user?.email || 'framelearn28@gmail.com';
+  // Handle Unified Dashboard Refresh (Refreshes bookings, services, and profile)
+  const handleRefreshDashboard = useCallback(async () => {
+    await Promise.all([
+      loadBookings(),
+      loadServices(),
+      refreshProfile(),
+    ]);
+  }, [loadBookings, loadServices, refreshProfile]);
+
+  const photographerName =
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    (user?.email ? user.email.split('@')[0] : 'Photographer');
+  const photographerEmail = profile?.email || user?.email || '';
   const photographerPhone = profile?.phone || null;
   const pendingCount =
     bookings?.filter((b) => b.status === 'submitted' || b.status === 'under_review').length ?? 0;
@@ -179,8 +191,8 @@ const PhotographerPortalContent: React.FC = () => {
           activeTab={activeTab}
           onOpenMobileNav={() => setIsMobileNavOpen(true)}
           onLogout={() => setIsLogoutDialogOpen(true)}
-          onRefresh={activeTab === 'bookings' ? loadBookings : loadServices}
-          isRefreshing={bookingsLoading || servicesLoading}
+          onRefresh={handleRefreshDashboard}
+          isRefreshing={bookingsLoading || servicesLoading || isProfileLoading}
           photographerName={photographerName}
           photographerEmail={photographerEmail}
         />
