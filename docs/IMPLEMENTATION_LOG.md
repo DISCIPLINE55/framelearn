@@ -200,7 +200,7 @@ This log records verified changes and implementation history. Every entry identi
   - TypeScript compilation: zero errors.
   - Production build: clean compilation.
 - **Milestone 002 Gate Status**:
-  - Ready for academic gate review by the Project Lecturer prior to commencing Milestone 003. Note: Milestone 002 is not formally accepted until the lecturer confirms acceptance.
+  - Formally accepted by the Project Lecturer. Milestone 002 approved; authorization granted to proceed with Milestone 003.
 
 ---
 
@@ -214,8 +214,8 @@ This log records verified changes and implementation history. Every entry identi
   - **Committed**: Local git commits prepared.
   - **Pushed**: Pending user review (git restriction strictly observed).
   - **Deployed**: Not deployed to Vercel (per production restrictions).
-  - **Presented to lecturer**: Pending.
-  - **Accepted by lecturer**: PENDING (Milestone 002 is NOT lecturer-accepted until formal confirmation).
+  - **Presented to lecturer**: Yes.
+  - **Accepted by lecturer**: Formally accepted.
 - **Purpose**: Inspect, secure, and stabilize the existing FrameLearn backend and photographer-access implementation without starting Milestone 003 or altering core architecture.
 - **Requirements Addressed**: Milestone 002 Corrective Requirements 1–13.
 - **Files Modified / Created**:
@@ -264,11 +264,12 @@ This log records verified changes and implementation history. Every entry identi
 - **Feature Name**: Milestone 002 — Real Business Operations & Zero-Mockup Enforcement
 - **Progression State**:
   - **Implemented locally**: Yes
-  - **Tested locally**: Yes (16 test files, 69 unit and integration tests passing)
+  - **Tested locally**: Yes (17 test files, 85 unit and integration tests passing)
   - **Applied to Supabase**: Core schema active on project `htnquutikqahijrtvjsv`. Zero fake data injected.
-  - **Committed**: Local git commits prepared.
+  - **Committed**: Yes (`848e881`)
   - **Pushed**: Pending user review.
   - **Deployed**: Retained on current branch.
+  - **Accepted by lecturer**: Formally accepted.
 - **Purpose**: Connect client booking inquiry submissions, photography services catalog, service packages, and photographer portal dashboard/management to real PostgreSQL operations without fake success notifications or invented data.
 - **Files Modified / Created**:
   - `src/features/services/api.ts` & `src/features/services/index.ts`: Live query functions for active and administrative services, package association, and service activation toggle.
