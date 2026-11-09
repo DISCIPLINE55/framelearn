@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import {
   fetchActiveServices,
   fetchAllServices,
   fetchServicePackages,
   toggleServiceActive,
 } from '../../src/features/services';
+import { ServicesPreviewPage } from '../../src/app/routes/ServicesPreviewPage';
 import { supabase } from '../../src/lib/database/supabase';
+import * as servicesApi from '../../src/features/services';
 
 describe('Photography Services and Packages Integration', () => {
   beforeEach(() => {
@@ -78,16 +81,17 @@ describe('Photography Services and Packages Integration', () => {
   });
 
   describe('fetchServicePackages', () => {
-    it('retrieves service packages sorted by sort_order', async () => {
-      const mockOrder = vi.fn().mockResolvedValue({
+    it('retrieves service packages sorted by sort_order and created_at', async () => {
+      const mockOrder2 = vi.fn().mockResolvedValue({
         data: [
           { id: 'pkg-1', service_id: 's1', name: 'Standard Session', price_amount: 500, currency: 'GHS' },
         ],
         error: null,
       });
+      const mockOrder1 = vi.fn().mockReturnValue({ order: mockOrder2 });
 
       vi.spyOn(supabase, 'from').mockReturnValue({
-        select: vi.fn().mockReturnValue({ order: mockOrder }),
+        select: vi.fn().mockReturnValue({ order: mockOrder1 }),
       } as any);
 
       const res = await fetchServicePackages();
@@ -98,8 +102,9 @@ describe('Photography Services and Packages Integration', () => {
     });
 
     it('filters by service_id when provided', async () => {
-      const mockOrder = vi.fn().mockResolvedValue({ data: [], error: null });
-      const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+      const mockOrder2 = vi.fn().mockResolvedValue({ data: [], error: null });
+      const mockOrder1 = vi.fn().mockReturnValue({ order: mockOrder2 });
+      const mockEq = vi.fn().mockReturnValue({ order: mockOrder1 });
 
       vi.spyOn(supabase, 'from').mockReturnValue({
         select: vi.fn().mockReturnValue({ eq: mockEq }),
@@ -144,5 +149,104 @@ describe('Photography Services and Packages Integration', () => {
       expect(res.error).toBe('Unauthorized permission');
     });
   });
-});
 
+  describe('Public Services Catalog UI Integration (ServicesPreviewPage)', () => {
+    it('renders active services and active packages with deliverables, featured badges, and pricing', async () => {
+      vi.spyOn(servicesApi, 'fetchActiveServices').mockResolvedValue({
+        data: [
+          {
+            id: 'srv-1',
+            name: 'Portrait Photography',
+            slug: 'portrait-photography',
+            category: 'Portraiture',
+            description: 'Professional portrait studio sessions.',
+            icon_name: 'camera',
+            cover_image_url: null,
+            is_active: true,
+            sort_order: 1,
+            created_at: '2026-10-20T00:00:00Z',
+            updated_at: '2026-10-20T00:00:00Z',
+          },
+        ],
+        error: null,
+      });
+
+      vi.spyOn(servicesApi, 'fetchServicePackages').mockResolvedValue({
+        data: [
+          {
+            id: 'pkg-1',
+            service_id: 'srv-1',
+            name: 'Executive Studio Portrait',
+            slug: 'executive-studio-portrait',
+            description: 'Professional headshots for executive profiles.',
+            price_amount: 850,
+            currency: 'GHS',
+            duration_minutes: 60,
+            deliverables: ['15 Retouched High-Res Photos', 'Private Proofing Gallery'],
+            is_featured: true,
+            is_active: true,
+            sort_order: 1,
+            created_at: '2026-10-20T00:00:00Z',
+            updated_at: '2026-10-20T00:00:00Z',
+          },
+          {
+            id: 'pkg-2',
+            service_id: 'srv-1',
+            name: 'Custom Creative Commission',
+            slug: 'custom-creative-commission',
+            description: 'Bespoke fine art photography.',
+            price_amount: null, // Custom quotation
+            currency: 'GHS',
+            duration_minutes: 120,
+            deliverables: ['Custom Art Print'],
+            is_featured: false,
+            is_active: true,
+            sort_order: 2,
+            created_at: '2026-10-20T00:00:00Z',
+            updated_at: '2026-10-20T00:00:00Z',
+          },
+          {
+            id: 'pkg-3',
+            service_id: 'srv-1',
+            name: 'Draft Hidden Package',
+            slug: 'draft-hidden-package',
+            description: 'Not yet available.',
+            price_amount: 200,
+            currency: 'GHS',
+            duration_minutes: 30,
+            deliverables: [],
+            is_featured: false,
+            is_active: false, // Inactive: must never be displayed
+            sort_order: 3,
+            created_at: '2026-10-20T00:00:00Z',
+            updated_at: '2026-10-20T00:00:00Z',
+          },
+        ],
+        error: null,
+      });
+
+      render(<ServicesPreviewPage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Portrait Photography')).toBeDefined();
+        expect(screen.getByText('Executive Studio Portrait')).toBeDefined();
+        expect(screen.getByText('GHS 850')).toBeDefined();
+        expect(screen.getByText('15 Retouched High-Res Photos')).toBeDefined();
+        expect(screen.getByText('Featured')).toBeDefined();
+      });
+
+      // Verify custom quotation displays "Inquire for a Quote"
+      expect(screen.getByText('Custom Creative Commission')).toBeDefined();
+      expect(screen.getByText('Inquire for a Quote')).toBeDefined();
+
+      // Verify inactive package is not visible
+      expect(screen.queryByText('Draft Hidden Package')).toBeNull();
+
+      // Verify null/NaN/0 does not leak
+      expect(screen.queryByText('GHS 0')).toBeNull();
+      expect(screen.queryByText('null')).toBeNull();
+      expect(screen.queryByText('undefined')).toBeNull();
+      expect(screen.queryByText('NaN')).toBeNull();
+    });
+  });
+});
