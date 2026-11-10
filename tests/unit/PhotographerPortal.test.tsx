@@ -106,6 +106,11 @@ describe('PhotographerPortalPage Component and Business View', () => {
       error: null,
     });
 
+    vi.spyOn(ServicesModule, 'fetchAllServicePackages').mockResolvedValue({
+      data: [],
+      error: null,
+    });
+
     render(
       <AppProvider>
         <PhotographerPortalPage />

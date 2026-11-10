@@ -3,5 +3,7 @@ export * from './components/DashboardTopBar';
 export * from './components/DashboardOverview';
 export * from './components/BookingsManagement';
 export * from './components/ServicesManagement';
+export * from './components/PackagesManagement';
 export * from './components/BookingDetailsModal';
 export * from './components/ServiceFormModal';
+export * from './components/PackageFormModal';

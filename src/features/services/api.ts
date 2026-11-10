@@ -73,9 +73,11 @@ export async function fetchAllServices(): Promise<{
 /**
  * Retrieves service packages from Supabase.
  * If serviceId is supplied, filters for that specific service.
+ * If onlyActive is true, explicitly filters for active packages.
  */
 export async function fetchServicePackages(
-  serviceId?: string
+  serviceId?: string,
+  onlyActive?: boolean
 ): Promise<{
   data: ServicePackage[];
   error: string | null;
@@ -94,7 +96,13 @@ export async function fetchServicePackages(
       query = query.eq('service_id', serviceId);
     }
 
-    const { data, error } = await query.order('sort_order', { ascending: true });
+    if (onlyActive) {
+      query = query.eq('is_active', true);
+    }
+
+    const { data, error } = await query
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true });
 
     if (error) {
       return { data: [], error: error.message };
